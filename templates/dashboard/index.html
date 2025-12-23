@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <header>
+        <h1>Bem-vindo ao Dashboard, {{user.username}}</h1>
+    </header>
+    <main>
+        <p>Estamos felizes em tê-lo aqui!</p>
+        
+        <div x-data="{ aberto: false }">
+            <div @click= "aberto = !aberto">
+                menu
+            </div>
+            <button  x-show="aberto" hx-post="{% url 'logout' %}" hx-target="body" hx-push-url="true">logout</button>
+        </div>
+        
+    </main>
+    <footer>
+        <p>&copy; 2023 Seu Nome. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>             
