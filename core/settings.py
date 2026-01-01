@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dashboard'
+    'dashboard',
+    'inventory',
+    'sales',
+    'finance',
 ]
 
 MIDDLEWARE = [
@@ -80,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'atena',
         'USER': 'postgres',
-        'PASSWORD': 'admin',
+        'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '5432',
     }

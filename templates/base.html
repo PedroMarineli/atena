@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Atena{% endblock %}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <nav class="bg-white shadow mb-4">
+        <div class="container mx-auto px-4 py-2 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold text-blue-600">Atena</a>
+            <div class="space-x-4">
+                <a href="{% url 'item_list' %}" class="text-gray-700 hover:text-blue-600">Estoque</a>
+                <a href="{% url 'sale_list' %}" class="text-gray-700 hover:text-blue-600">Vendas</a>
+                {% if user.role == 'ADMIN' %}
+                <a href="{% url 'transaction_list' %}" class="text-gray-700 hover:text-blue-600">Financeiro</a>
+                {% endif %}
+                <form action="{% url 'logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-600 hover:text-red-800">Sair</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <main class="container mx-auto px-4">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

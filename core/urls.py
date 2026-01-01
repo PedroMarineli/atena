@@ -21,5 +21,9 @@ from django.urls import include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('dashboard/', include('dashboard.urls'))
+    path('dashboard/', include('dashboard.urls')),
+    path('inventory/', include('inventory.urls')),
+    path('sales/', include('sales.urls')),
+    path('finance/', include('finance.urls')),
+    path('', include('dashboard.urls')),
 ]

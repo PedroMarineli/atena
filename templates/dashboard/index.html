@@ -1,30 +1,24 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <header>
-        <h1>Bem-vindo ao Dashboard, {{user.username}}</h1>
-    </header>
-    <main>
-        <p>Estamos felizes em tê-lo aqui!</p>
-        
-        <div x-data="{ aberto: false }">
-            <div @click= "aberto = !aberto">
-                menu
-            </div>
-            <button  x-show="aberto" hx-post="{% url 'logout' %}" hx-target="body" hx-push-url="true">logout</button>
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6">Bem-vindo, {{ user.email }}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-2">Vendas Hoje</h3>
+            <p class="text-3xl font-bold text-blue-600">R$ 0,00</p>
         </div>
         
-    </main>
-    <footer>
-        <p>&copy; 2023 Seu Nome. Todos os direitos reservados.</p>
-    </footer>
-</body>
-</html>             
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-2">Pedidos Pendentes</h3>
+            <p class="text-3xl font-bold text-orange-600">0</p>
+        </div>
+        
+        {% if user.role == 'ADMIN' %}
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-2">Fluxo de Caixa</h3>
+            <p class="text-3xl font-bold text-green-600">R$ 0,00</p>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Estoque</h2>
+<div class="bg-white shadow rounded-lg p-4">
+    <table class="w-full">
+        <thead>
+            <tr class="text-left border-b">
+                <th class="pb-2">Nome</th>
+                <th class="pb-2">Tipo</th>
+                <th class="pb-2">SKU</th>
+                <th class="pb-2">Preço</th>
+                <th class="pb-2">Estoque</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr class="border-b last:border-0">
+                <td class="py-2">{{ item.name }}</td>
+                <td class="py-2">{{ item.get_type_display }}</td>
+                <td class="py-2">{{ item.sku|default:"-" }}</td>
+                <td class="py-2">R$ {{ item.price }}</td>
+                <td class="py-2">
+                    {% if item.type == 'PRODUCT' %}
+                        {{ item.stock }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
