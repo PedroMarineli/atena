@@ -10,6 +10,7 @@ from .forms import CustomUserCreationForm
 def is_admin(user):
     return user.role == 'ADMIN' or user.is_superuser
 
+# Dashboard home view
 @login_required
 def index(request):
     today = timezone.now().date()
@@ -39,6 +40,7 @@ def index(request):
     
     return render(request, 'dashboard/index.html', context)
 
+#Create a new user
 @login_required
 @user_passes_test(is_admin)
 def user_create(request):
