@@ -1,6 +1,7 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from dashboard.models import User
-from inventory.models import Item
+# from inventory.models import Item
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
@@ -28,9 +29,22 @@ class Sale(models.Model):
 
 class SaleItem(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='items')
-    item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name='sale_items')
+    # item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name='sale_items')
+    product = models.ForeignKey('inventory.Product', null=True, blank=True, on_delete=models.SET_NULL)
+    service = models.ForeignKey('inventory.Service', null=True, blank=True, on_delete=models.SET_NULL)
     quantity = models.IntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2) # Price at the moment of sale
     
+    def clean(self):
+        if self.product and self.service:
+            raise ValidationError("A SaleItem cannot be both a Product and a Service.")
+        if not self.product and not self.service:
+            raise ValidationError("A SaleItem must be either a Product or a Service.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+    
     def __str__(self):
-        return f"{self.quantity}x {self.item.name} in Sale #{self.sale.id}"
+        item_name = self.product.name if self.product else (self.service.name if self.service else "Unknown")
+        return f"{self.quantity}x {item_name} in Sale #{self.sale.id}"

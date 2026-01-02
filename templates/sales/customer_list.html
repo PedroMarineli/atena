@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+    <h2 class="text-2xl font-bold">Clientes</h2>
+    <a href="{% url 'customer_create' %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        Novo Cliente
+    </a>
+</div>
+
+<div class="bg-white shadow rounded-lg p-4">
+    <table class="w-full">
+        <thead>
+            <tr class="text-left border-b">
+                <th class="pb-2">Nome</th>
+                <th class="pb-2">Email</th>
+                <th class="pb-2">Telefone</th>
+                <th class="pb-2">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr class="border-b last:border-0">
+                <td class="py-2">{{ customer.name }}</td>
+                <td class="py-2">{{ customer.email }}</td>
+                <td class="py-2">{{ customer.phone }}</td>
+                <td class="py-2">
+                    <a href="{% url 'customer_update' customer.pk %}" class="text-blue-600 hover:text-blue-900 mr-2">Editar</a>
+                    <form action="{% url 'customer_delete' customer.pk %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Tem certeza?')">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

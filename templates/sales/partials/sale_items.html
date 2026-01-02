@@ -1,0 +1,47 @@
+<table class="w-full">
+    <thead>
+        <tr class="text-left border-b">
+            <th class="pb-2">Item</th>
+            <th class="pb-2">Qtd</th>
+            <th class="pb-2">Preço Unit.</th>
+            <th class="pb-2">Subtotal</th>
+            <th class="pb-2">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in sale.items.all %}
+        <tr class="border-b last:border-0">
+            <td class="py-2">
+                {% if item.product %}
+                    {{ item.product.name }} (Produto)
+                {% elif item.service %}
+                    {{ item.service.name }} (Serviço)
+                {% else %}
+                    Item desconhecido
+                {% endif %}
+            </td>
+            <td class="py-2">{{ item.quantity }}</td>
+            <td class="py-2">R$ {{ item.price }}</td>
+            <td class="py-2">R$ {% widthratio item.price 1 item.quantity %}</td>
+            <td class="py-2">
+                <button hx-delete="{% url 'sale_remove_item' sale.pk item.pk %}" 
+                        hx-target="#sale-items-container" 
+                        class="text-red-600 hover:text-red-900">
+                    Remover
+                </button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="py-4 text-center text-gray-500">Nenhum item adicionado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr class="font-bold border-t">
+            <td colspan="3" class="py-2 text-right">Total:</td>
+            <td class="py-2">R$ {{ sale.total }}</td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>

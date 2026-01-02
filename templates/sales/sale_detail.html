@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">Venda #{{ sale.id }}</h2>
+        <a href="{% url 'sale_list' %}" class="text-blue-500 hover:text-blue-700">Voltar</a>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <p class="text-gray-600">Cliente:</p>
+                <p class="font-bold">{{ sale.customer.name }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600">Vendedor:</p>
+                <p class="font-bold">{{ sale.seller.email }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600">Data:</p>
+                <p class="font-bold">{{ sale.created_at|date:"d/m/Y H:i" }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600">Status:</p>
+                <p class="font-bold">{{ sale.get_status_display }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-xl font-bold mb-4">Itens</h3>
+        
+        <div class="mb-4">
+            <form hx-post="{% url 'sale_add_item' sale.pk %}" hx-target="#sale-items-container" class="flex gap-2 items-end flex-wrap">
+                {% csrf_token %}
+                <div class="flex-grow min-w-[200px]">
+                    <label class="block text-sm font-medium text-gray-700">Produto</label>
+                    {{ form.product }}
+                </div>
+                <div class="flex-grow min-w-[200px]">
+                    <label class="block text-sm font-medium text-gray-700">Serviço</label>
+                    {{ form.service }}
+                </div>
+                <div class="w-24">
+                    <label class="block text-sm font-medium text-gray-700">Qtd</label>
+                    {{ form.quantity }}
+                </div>
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Adicionar
+                </button>
+            </form>
+        </div>
+
+        <div id="sale-items-container">
+            {% include 'sales/partials/sale_items.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

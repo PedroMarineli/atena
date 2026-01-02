@@ -1,35 +1,50 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">Estoque</h2>
-<div class="bg-white shadow rounded-lg p-4">
-    <table class="w-full">
-        <thead>
-            <tr class="text-left border-b">
-                <th class="pb-2">Nome</th>
-                <th class="pb-2">Tipo</th>
-                <th class="pb-2">SKU</th>
-                <th class="pb-2">Preço</th>
-                <th class="pb-2">Estoque</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in items %}
-            <tr class="border-b last:border-0">
-                <td class="py-2">{{ item.name }}</td>
-                <td class="py-2">{{ item.get_type_display }}</td>
-                <td class="py-2">{{ item.sku|default:"-" }}</td>
-                <td class="py-2">R$ {{ item.price }}</td>
-                <td class="py-2">
-                    {% if item.type == 'PRODUCT' %}
-                        {{ item.stock }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div x-data="{ open: false }">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">{{ page_title|default:"Estoque" }}</h2>
+        <button hx-get="{% url 'item_create' %}" 
+                hx-target="#modal-content" 
+                @click="open = true" 
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Novo Item
+        </button>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-4">
+        <table class="w-full">
+            <thead>
+                <tr class="text-left border-b">
+                    <th class="pb-2">Nome</th>
+                    <th class="pb-2">Tipo</th>
+                    <th class="pb-2">SKU</th>
+                    <th class="pb-2">Preço</th>
+                    <th class="pb-2">Estoque</th>
+                    <th class="pb-2">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="item-table-body">
+                {% include 'inventory/partials/item_list_rows.html' %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div x-show="open" 
+         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         style="display: none;">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div id="modal-content">
+                <!-- Content loaded via HTMX -->
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
