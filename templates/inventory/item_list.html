@@ -4,12 +4,20 @@
 <div x-data="{ open: false }">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">{{ page_title|default:"Estoque" }}</h2>
-        <button hx-get="{% url 'item_create' %}" 
-                hx-target="#modal-content" 
-                @click="open = true" 
-                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-            Novo Item
-        </button>
+        <div>
+            <button hx-get="{% url 'item_create' %}" 
+                    hx-target="#modal-content" 
+                    @click="open = true" 
+                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
+                Novo Produto
+            </button>
+            <button hx-get="{% url 'service_create' %}" 
+                    hx-target="#modal-content" 
+                    @click="open = true" 
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Novo Serviço
+            </button>
+        </div>
     </div>
 
     <div class="bg-white shadow rounded-lg p-4">

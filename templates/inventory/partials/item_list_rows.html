@@ -30,9 +30,18 @@
     <td class="py-2">R$ {{ service.price }}</td>
     <td class="py-2">-</td>
     <td class="py-2">
-        <!-- TODO: Implement Service editing/deletion -->
-        <span class="text-gray-400 mr-2">Editar</span>
-        <span class="text-gray-400">Excluir</span>
+        <button hx-get="{% url 'service_update' service.pk %}" 
+                hx-target="#modal-content" 
+                @click="open = true" 
+                class="text-blue-600 hover:text-blue-900 mr-2">
+            Editar
+        </button>
+        <button hx-delete="{% url 'service_delete' service.pk %}" 
+                hx-confirm="Tem certeza que deseja excluir este serviço?" 
+                hx-target="#item-table-body" 
+                class="text-red-600 hover:text-red-900">
+            Excluir
+        </button>
     </td>
 </tr>
 {% endfor %}
