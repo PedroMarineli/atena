@@ -8,28 +8,57 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <nav class="bg-white shadow mb-4">
-        <div class="container mx-auto px-4 py-2 flex justify-between items-center">
-            <a href="/" class="text-xl font-bold text-blue-600">Atena</a>
-            <div class="space-x-4">
-                <a href="{% url 'customer_list' %}" class="text-gray-700 hover:text-blue-600">Clientes</a>
-                <a href="{% url 'supplier_list' %}" class="text-gray-700 hover:text-blue-600">Fornecedores</a>
-                <a href="{% url 'item_list' %}" class="text-gray-700 hover:text-blue-600">Produtos</a>
-                <a href="{% url 'service_list' %}" class="text-gray-700 hover:text-blue-600">Serviços</a>
-                <a href="{% url 'sale_list' %}" class="text-gray-700 hover:text-blue-600">Vendas</a>
-                {% if user.role == 'ADMIN' or user.is_superuser %}
-                <a href="{% url 'transaction_list' %}" class="text-gray-700 hover:text-blue-600">Financeiro</a>
-                <a href="{% url 'user_create' %}" class="text-gray-700 hover:text-blue-600">Usuários</a>
-                {% endif %}
+<script>
+    tailwind.config = {
+        theme: {
+        extend: {
+            colors: {
+            primary: '#730E20',
+            secondary: '#8C5B30',
+            accent: '#8C241B',
+            dark: '#400707',
+            black: '#0D0D0D',
+            }
+        }
+        }
+    }
+</script>
+<body class="bg-gray-100 flex h-screen overflow-hidden" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-primary text-white flex flex-col shadow-lg">
+        <div class="p-6 bg-dark flex items-center justify-center">
+            <a href="/" class="text-2xl font-bold tracking-wider">Atena</a>
+        </div>
+        
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <a href="{% url 'customer_list' %}" class="block px-4 py-2 rounded transition-colors hover:bg-secondary">Clientes</a>
+            <a href="{% url 'supplier_list' %}" class="block px-4 py-2 rounded transition-colors hover:bg-secondary">Fornecedores</a>
+            <a href="{% url 'item_list' %}" class="block px-4 py-2 rounded transition-colors hover:bg-secondary">Produtos</a>
+            <a href="{% url 'service_list' %}" class="block px-4 py-2 rounded transition-colors hover:bg-secondary">Serviços</a>
+            <a href="{% url 'sale_list' %}" class="block px-4 py-2 rounded transition-colors hover:bg-secondary">Vendas</a>
+            
+            {% if user.role == 'ADMIN' or user.is_superuser %}
+            <div class="pt-4 pb-2">
+                <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Administração</p>
+            </div>
+            <a href="{% url 'transaction_list' %}" class="block px-4 py-2 rounded transition-colors hover:bg-secondary">Financeiro</a>
+            <a href="{% url 'user_create' %}" class="block px-4 py-2 rounded transition-colors hover:bg-secondary">Usuários</a>
+            {% endif %}
+        </nav>
+
+        <div class="p-4 bg-dark border-t border-secondary">
+            <div class="flex items-center justify-between">
+                <span class="text-sm truncate mr-2">{{ user.email }}</span>
                 <form action="{% url 'logout' %}" method="post" class="inline">
                     {% csrf_token %}
-                    <button type="submit" class="text-red-600 hover:text-red-800">Sair</button>
+                    <button type="submit" class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">Sair</button>
                 </form>
             </div>
         </div>
-    </nav>
-    <main class="container mx-auto px-4">
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-gray-100 p-8">
         {% block content %}{% endblock %}
     </main>
 </body>
