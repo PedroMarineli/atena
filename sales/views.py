@@ -2,8 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.db import transaction
+from django.utils import timezone
+from django.contrib import messages
 from .models import Sale, SaleItem, Customer
 from .forms import SaleForm, SaleItemForm, CustomerForm
+from finance.models import Transaction
 # from inventory.models import Item
 
 @login_required
@@ -126,23 +130,15 @@ def sale_add_item(request, pk):
         if form.is_valid():
             sale_item = form.save(commit=False)
             sale_item.sale = sale
-            sale_item.price = sale_item.item.price # Set price from item
-            sale_item.save()
-            # Update sale total
-            sale.total = sum(item.quantity * item.price for item in sale.items.all())
-            sale.save()
             
-            if request.htmx:
-                return render(request, 'sales/partials/sale_items.html', {'sale': sale})
-@login_required
-def sale_add_item(request, pk):
-    sale = get_object_or_404(Sale, pk=pk)
-    if request.method == 'POST':
-        form = SaleItemForm(request.POST)
-        if form.is_valid():
-            sale_item = form.save(commit=False)
-            sale_item.sale = sale
-            # sale_item.price = sale_item.item.price # Set price from item
+            # Check stock availability
+            if sale_item.product:
+                if sale_item.product.stock < sale_item.quantity:
+                    messages.error(request, f'Estoque insuficiente para {sale_item.product.name}. Disponível: {sale_item.product.stock}')
+                    if request.htmx:
+                        return render(request, 'sales/partials/sale_items.html', {'sale': sale})
+                    return redirect('sale_detail', pk=pk)
+
             if sale_item.product:
                 sale_item.price = sale_item.product.price
             elif sale_item.service:
@@ -158,6 +154,7 @@ def sale_add_item(request, pk):
             if request.htmx:
                 return render(request, 'sales/partials/sale_items.html', {'sale': sale})
     return redirect('sale_detail', pk=pk)
+    return redirect('sale_detail', pk=pk)
 
 @require_http_methods(["DELETE", "POST"])
 def sale_remove_item(request, pk, item_pk):
@@ -171,4 +168,52 @@ def sale_remove_item(request, pk, item_pk):
     
     if request.htmx:
         return render(request, 'sales/partials/sale_items.html', {'sale': sale})
+    return redirect('sale_detail', pk=pk)
+
+@login_required
+@require_http_methods(["POST"])
+def sale_finalize(request, pk):
+    sale = get_object_or_404(Sale, pk=pk)
+    
+    if sale.status == 'COMPLETED':
+        messages.warning(request, 'Esta venda já foi finalizada.')
+        return redirect('sale_detail', pk=pk)
+        
+    if not sale.items.exists():
+        messages.error(request, 'Não é possível finalizar uma venda sem itens.')
+        return redirect('sale_detail', pk=pk)
+
+    try:
+        with transaction.atomic():
+            # 1. Deduct stock from Inventory (for Products)
+            for item in sale.items.all():
+                if item.product:
+                    # Refresh product from db to ensure stock is up to date
+                    item.product.refresh_from_db()
+                    if item.product.stock < item.quantity:
+                        raise ValueError(f'Estoque insuficiente para o produto {item.product.name}. Estoque atual: {item.product.stock}')
+                    item.product.stock -= item.quantity
+                    item.product.save()
+            
+            # 2. Generate a "Receivable" (Transaction type=INCOME) in Finance
+            Transaction.objects.create(
+                description=f"Venda #{sale.id} - {sale.customer.name}",
+                amount=sale.total,
+                type='INCOME',
+                status='PENDING',
+                due_date=timezone.now().date(),
+                sale=sale
+            )
+            
+            # 3. Update sale status
+            sale.status = 'COMPLETED'
+            sale.save()
+            
+            messages.success(request, 'Venda finalizada com sucesso!')
+            
+    except ValueError as e:
+        messages.error(request, str(e))
+    except Exception as e:
+        messages.error(request, f'Erro ao finalizar venda: {str(e)}')
+        
     return redirect('sale_detail', pk=pk)

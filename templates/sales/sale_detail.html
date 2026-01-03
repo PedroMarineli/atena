@@ -56,5 +56,16 @@
             {% include 'sales/partials/sale_items.html' %}
         </div>
     </div>
+
+    <div class="mt-6 flex justify-end">
+        {% if sale.status == 'PENDING' %}
+        <form action="{% url 'sale_finalize' sale.pk %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded" onclick="return confirm('Tem certeza que deseja finalizar esta venda? Isso irá baixar o estoque e gerar uma transação financeira.')">
+                Finalizar Venda
+            </button>
+        </form>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
