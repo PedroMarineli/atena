@@ -75,7 +75,7 @@ def customer_delete(request, pk):
 
 @login_required
 def sale_list(request):
-    sales = Sale.objects.all()
+    sales = Sale.objects.select_related('customer', 'seller').all()
     return render(request, 'sales/sale_list.html', {'sales': sales})
 
 @login_required
