@@ -1,0 +1,21 @@
+{% for supplier in suppliers %}
+<tr class="border-b last:border-0">
+    <td class="py-2">{{ supplier.name }}</td>
+    <td class="py-2">{{ supplier.email }}</td>
+    <td class="py-2">{{ supplier.phone }}</td>
+    <td class="py-2">
+        <button hx-get="{% url 'supplier_update' supplier.pk %}" 
+                hx-target="#modal-content" 
+                @click="open = true"
+                class="text-blue-600 hover:text-blue-900 mr-2">
+            Editar
+        </button>
+        <button hx-delete="{% url 'supplier_delete' supplier.pk %}" 
+                hx-confirm="Tem certeza que deseja excluir este fornecedor?" 
+                hx-target="#supplier-table-body" 
+                class="text-red-600 hover:text-red-900">
+            Excluir
+        </button>
+    </td>
+</tr>
+{% endfor %}

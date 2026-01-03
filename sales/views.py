@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from .models import Sale, SaleItem, Customer
 from .forms import SaleForm, SaleItemForm, CustomerForm
 # from inventory.models import Item
@@ -16,10 +17,17 @@ def customer_create(request):
         form = CustomerForm(request.POST)
         if form.is_valid():
             form.save()
+            if request.htmx:
+                customers = Customer.objects.all()
+                return render(request, 'sales/partials/customer_list_rows.html', {'customers': customers})
             return redirect('customer_list')
     else:
         form = CustomerForm()
-    return render(request, 'sales/customer_form.html', {'form': form})
+    
+    context = {'form': form, 'submit_url': reverse('customer_create'), 'modal_title': 'Novo Cliente'}
+    if request.htmx:
+        return render(request, 'sales/partials/customer_form.html', context)
+    return render(request, 'sales/customer_form.html', context)
 
 @login_required
 def customer_update(request, pk):
@@ -28,18 +36,27 @@ def customer_update(request, pk):
         form = CustomerForm(request.POST, instance=customer)
         if form.is_valid():
             form.save()
+            if request.htmx:
+                customers = Customer.objects.all()
+                return render(request, 'sales/partials/customer_list_rows.html', {'customers': customers})
             return redirect('customer_list')
     else:
         form = CustomerForm(instance=customer)
-    return render(request, 'sales/customer_form.html', {'form': form})
+    
+    context = {'form': form, 'submit_url': reverse('customer_update', args=[pk]), 'modal_title': 'Editar Cliente'}
+    if request.htmx:
+        return render(request, 'sales/partials/customer_form.html', context)
+    return render(request, 'sales/customer_form.html', context)
 
 @login_required
+@require_http_methods(["DELETE", "POST"])
 def customer_delete(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
-    if request.method == 'POST':
-        customer.delete()
-        return redirect('customer_list')
-    return render(request, 'sales/customer_confirm_delete.html', {'customer': customer})
+    customer.delete()
+    if request.htmx:
+        customers = Customer.objects.all()
+        return render(request, 'sales/partials/customer_list_rows.html', {'customers': customers})
+    return redirect('customer_list')
 
 @login_required
 def sale_list(request):

@@ -1,0 +1,27 @@
+{% for user in users %}
+<tr class="border-b last:border-0">
+    <td class="py-2">{{ user.email }}</td>
+    <td class="py-2">{{ user.get_role_display }}</td>
+    <td class="py-2">
+        {% if user.is_active %}
+            <span class="text-green-500">Sim</span>
+        {% else %}
+            <span class="text-red-500">Não</span>
+        {% endif %}
+    </td>
+    <td class="py-2">
+        <button hx-get="{% url 'user_update' user.pk %}" 
+                hx-target="#modal-content" 
+                @click="open = true" 
+                class="text-blue-600 hover:text-blue-900 mr-2">
+            Editar
+        </button>
+        <button hx-delete="{% url 'user_delete' user.pk %}" 
+                hx-confirm="Tem certeza que deseja excluir este usuário?" 
+                hx-target="#user-table-body" 
+                class="text-red-600 hover:text-red-900">
+            Excluir
+        </button>
+    </td>
+</tr>
+{% endfor %}

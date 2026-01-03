@@ -17,10 +17,17 @@ def supplier_create(request):
         form = SupplierForm(request.POST)
         if form.is_valid():
             form.save()
+            if request.htmx:
+                suppliers = Supplier.objects.all()
+                return render(request, 'inventory/partials/supplier_list_rows.html', {'suppliers': suppliers})
             return redirect('supplier_list')
     else:
         form = SupplierForm()
-    return render(request, 'inventory/supplier_form.html', {'form': form})
+    
+    context = {'form': form, 'submit_url': reverse('supplier_create'), 'modal_title': 'Novo Fornecedor'}
+    if request.htmx:
+        return render(request, 'inventory/partials/supplier_form.html', context)
+    return render(request, 'inventory/supplier_form.html', context)
 
 @login_required
 def supplier_update(request, pk):
@@ -29,18 +36,27 @@ def supplier_update(request, pk):
         form = SupplierForm(request.POST, instance=supplier)
         if form.is_valid():
             form.save()
+            if request.htmx:
+                suppliers = Supplier.objects.all()
+                return render(request, 'inventory/partials/supplier_list_rows.html', {'suppliers': suppliers})
             return redirect('supplier_list')
     else:
         form = SupplierForm(instance=supplier)
-    return render(request, 'inventory/supplier_form.html', {'form': form})
+    
+    context = {'form': form, 'submit_url': reverse('supplier_update', args=[pk]), 'modal_title': 'Editar Fornecedor'}
+    if request.htmx:
+        return render(request, 'inventory/partials/supplier_form.html', context)
+    return render(request, 'inventory/supplier_form.html', context)
 
 @login_required
+@require_http_methods(["DELETE", "POST"])
 def supplier_delete(request, pk):
     supplier = get_object_or_404(Supplier, pk=pk)
-    if request.method == 'POST':
-        supplier.delete()
-        return redirect('supplier_list')
-    return render(request, 'inventory/supplier_confirm_delete.html', {'supplier': supplier})
+    supplier.delete()
+    if request.htmx:
+        suppliers = Supplier.objects.all()
+        return render(request, 'inventory/partials/supplier_list_rows.html', {'suppliers': suppliers})
+    return redirect('supplier_list')
 
 def get_inventory_context():
     return {

@@ -1,0 +1,21 @@
+{% for customer in customers %}
+<tr class="border-b last:border-0">
+    <td class="py-2">{{ customer.name }}</td>
+    <td class="py-2">{{ customer.email }}</td>
+    <td class="py-2">{{ customer.phone }}</td>
+    <td class="py-2">
+        <button hx-get="{% url 'customer_update' customer.pk %}" 
+                hx-target="#modal-content" 
+                @click="open = true"
+                class="text-blue-600 hover:text-blue-900 mr-2">
+            Editar
+        </button>
+        <button hx-delete="{% url 'customer_delete' customer.pk %}" 
+                hx-confirm="Tem certeza que deseja excluir este cliente?" 
+                hx-target="#customer-table-body" 
+                class="text-red-600 hover:text-red-900">
+            Excluir
+        </button>
+    </td>
+</tr>
+{% endfor %}

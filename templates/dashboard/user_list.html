@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
+{% block title %}Usuários - Atena{% endblock %}
+
 {% block content %}
 <div x-data="{ open: false }">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">Clientes</h2>
-        <button hx-get="{% url 'customer_create' %}" 
+        <h2 class="text-2xl font-bold">Lista de Usuários</h2>
+        <button hx-get="{% url 'user_create' %}" 
                 hx-target="#modal-content" 
                 @click="open = true" 
-                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-            Novo Cliente
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Novo Usuário
         </button>
     </div>
 
@@ -16,14 +18,14 @@
         <table class="w-full">
             <thead>
                 <tr class="text-left border-b">
-                    <th class="pb-2">Nome</th>
                     <th class="pb-2">Email</th>
-                    <th class="pb-2">Telefone</th>
+                    <th class="pb-2">Cargo</th>
+                    <th class="pb-2">Ativo</th>
                     <th class="pb-2">Ações</th>
                 </tr>
             </thead>
-            <tbody id="customer-table-body">
-                {% include 'sales/partials/customer_list_rows.html' %}
+            <tbody id="user-table-body">
+                {% include 'dashboard/partials/user_list_rows.html' %}
             </tbody>
         </table>
     </div>
