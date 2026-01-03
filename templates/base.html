@@ -48,7 +48,7 @@
 
         <div class="p-4 bg-dark border-t border-secondary">
             <div class="flex items-center justify-between">
-                <span class="text-sm truncate mr-2">{{ user.email }}</span>
+                <span class="text-sm truncate mr-2">{{ user.get_full_name }}</span>
                 <form action="{% url 'logout' %}" method="post" class="inline">
                     {% csrf_token %}
                     <button type="submit" class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">Sair</button>

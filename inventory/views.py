@@ -70,23 +70,17 @@ def supplier_delete(request, pk):
         return HttpResponse(rows_html + messages_html)
     return redirect('supplier_list')
 
-def get_inventory_context():
-    return {
-        'products': Product.objects.all(),
-        'services': Service.objects.all()
-    }
-
 @login_required
 def item_list(request):
-    context = get_inventory_context()
+    context = {'products': Product.objects.all()}
     context['page_title'] = 'Produtos'
-    return render(request, 'inventory/item_list.html', context)
+    return render(request, 'inventory/product_list.html', context)
 
 @login_required
 def service_list(request):
-    context = get_inventory_context()
+    context = {'services': Service.objects.all()}
     context['page_title'] = 'Serviços'
-    return render(request, 'inventory/item_list.html', context)
+    return render(request, 'inventory/service_list.html', context)
 
 @login_required
 def item_create(request):
@@ -95,7 +89,7 @@ def item_create(request):
         if form.is_valid():
             form.save()
             if request.htmx:
-                return render(request, 'inventory/partials/item_list_rows.html', get_inventory_context())
+                return render(request, 'inventory/partials/product_list_rows.html', {'products': Product.objects.all()})
             return redirect('item_list')
     else:
         form = ProductForm()
@@ -113,7 +107,7 @@ def item_update(request, pk):
         if form.is_valid():
             form.save()
             if request.htmx:
-                return render(request, 'inventory/partials/item_list_rows.html', get_inventory_context())
+                return render(request, 'inventory/partials/product_list_rows.html', {'products': Product.objects.all()})
             return redirect('item_list')
     else:
         form = ProductForm(instance=item)
@@ -135,7 +129,7 @@ def item_delete(request, pk):
         messages.error(request, 'Não é possível excluir este produto pois existem vendas associadas a ele.')
 
     if request.htmx:
-        rows_html = render_to_string('inventory/partials/item_list_rows.html', get_inventory_context(), request=request)
+        rows_html = render_to_string('inventory/partials/product_list_rows.html', {'products': Product.objects.all()}, request=request)
         messages_html = render_to_string('partials/messages.html', {}, request=request)
         return HttpResponse(rows_html + messages_html)
     return redirect('item_list')
@@ -147,7 +141,7 @@ def service_create(request):
         if form.is_valid():
             form.save()
             if request.htmx:
-                return render(request, 'inventory/partials/item_list_rows.html', get_inventory_context())
+                return render(request, 'inventory/partials/service_list_rows.html', {'services': Service.objects.all()})
             return redirect('service_list')
     else:
         form = ServiceForm()
@@ -165,7 +159,7 @@ def service_update(request, pk):
         if form.is_valid():
             form.save()
             if request.htmx:
-                return render(request, 'inventory/partials/item_list_rows.html', get_inventory_context())
+                return render(request, 'inventory/partials/service_list_rows.html', {'services': Service.objects.all()})
             return redirect('service_list')
     else:
         form = ServiceForm(instance=service)
@@ -187,7 +181,7 @@ def service_delete(request, pk):
         messages.error(request, 'Não é possível excluir este serviço pois existem vendas associadas a ele.')
 
     if request.htmx:
-        rows_html = render_to_string('inventory/partials/item_list_rows.html', get_inventory_context(), request=request)
+        rows_html = render_to_string('inventory/partials/service_list_rows.html', {'services': Service.objects.all()}, request=request)
         messages_html = render_to_string('partials/messages.html', {}, request=request)
         return HttpResponse(rows_html + messages_html)
     return redirect('service_list')

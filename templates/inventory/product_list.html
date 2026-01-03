@@ -3,19 +3,13 @@
 {% block content %}
 <div x-data="{ open: false }">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">{{ page_title|default:"Estoque" }}</h2>
+        <h2 class="text-2xl font-bold">{{ page_title|default:"Produtos" }}</h2>
         <div>
             <button hx-get="{% url 'item_create' %}" 
                     hx-target="#modal-content" 
                     @click="open = true" 
                     class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
                 Novo Produto
-            </button>
-            <button hx-get="{% url 'service_create' %}" 
-                    hx-target="#modal-content" 
-                    @click="open = true" 
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Novo Serviço
             </button>
         </div>
     </div>
@@ -25,7 +19,6 @@
             <thead>
                 <tr class="text-left border-b">
                     <th class="pb-2">Nome</th>
-                    <th class="pb-2">Tipo</th>
                     <th class="pb-2">SKU</th>
                     <th class="pb-2">Preço</th>
                     <th class="pb-2">Estoque</th>
@@ -33,7 +26,7 @@
                 </tr>
             </thead>
             <tbody id="item-table-body">
-                {% include 'inventory/partials/item_list_rows.html' %}
+                {% include 'inventory/partials/product_list_rows.html' %}
             </tbody>
         </table>
     </div>
@@ -48,10 +41,8 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          style="display: none;">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div id="modal-content">
-                <!-- Content loaded via HTMX -->
-            </div>
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" id="modal-content">
+            <!-- Content loaded via HTMX -->
         </div>
     </div>
 </div>
