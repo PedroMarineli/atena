@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
@@ -58,12 +59,15 @@ def supplier_delete(request, pk):
     supplier = get_object_or_404(Supplier, pk=pk)
     try:
         supplier.delete()
+        messages.success(request, 'Fornecedor excluído com sucesso.')
     except models.ProtectedError:
         messages.error(request, 'Não é possível excluir este fornecedor pois existem produtos associados a ele.')
 
     if request.htmx:
         suppliers = Supplier.objects.all()
-        return render(request, 'inventory/partials/supplier_list_rows.html', {'suppliers': suppliers})
+        rows_html = render_to_string('inventory/partials/supplier_list_rows.html', {'suppliers': suppliers}, request=request)
+        messages_html = render_to_string('partials/messages.html', {}, request=request)
+        return HttpResponse(rows_html + messages_html)
     return redirect('supplier_list')
 
 def get_inventory_context():
@@ -126,11 +130,14 @@ def item_delete(request, pk):
     item = get_object_or_404(Product, pk=pk)
     try:
         item.delete()
+        messages.success(request, 'Produto excluído com sucesso.')
     except models.ProtectedError:
         messages.error(request, 'Não é possível excluir este produto pois existem vendas associadas a ele.')
 
     if request.htmx:
-        return render(request, 'inventory/partials/item_list_rows.html', get_inventory_context())
+        rows_html = render_to_string('inventory/partials/item_list_rows.html', get_inventory_context(), request=request)
+        messages_html = render_to_string('partials/messages.html', {}, request=request)
+        return HttpResponse(rows_html + messages_html)
     return redirect('item_list')
 
 @login_required
@@ -175,9 +182,12 @@ def service_delete(request, pk):
     service = get_object_or_404(Service, pk=pk)
     try:
         service.delete()
+        messages.success(request, 'Serviço excluído com sucesso.')
     except models.ProtectedError:
         messages.error(request, 'Não é possível excluir este serviço pois existem vendas associadas a ele.')
 
     if request.htmx:
-        return render(request, 'inventory/partials/item_list_rows.html', get_inventory_context())
+        rows_html = render_to_string('inventory/partials/item_list_rows.html', get_inventory_context(), request=request)
+        messages_html = render_to_string('partials/messages.html', {}, request=request)
+        return HttpResponse(rows_html + messages_html)
     return redirect('service_list')

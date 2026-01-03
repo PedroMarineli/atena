@@ -1,4 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Transaction
@@ -51,7 +54,10 @@ def transaction_update(request, pk):
 def transaction_delete(request, pk):
     transaction = get_object_or_404(Transaction, pk=pk)
     transaction.delete()
+    messages.success(request, 'Transação excluída com sucesso.')
     if request.htmx:
         transactions = Transaction.objects.all()
-        return render(request, 'finance/partials/transaction_list_rows.html', {'transactions': transactions})
+        rows_html = render_to_string('finance/partials/transaction_list_rows.html', {'transactions': transactions}, request=request)
+        messages_html = render_to_string('partials/messages.html', {}, request=request)
+        return HttpResponse(rows_html + messages_html)
     return redirect('transaction_list')

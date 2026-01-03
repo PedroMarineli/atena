@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
@@ -60,12 +62,15 @@ def customer_delete(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     try:
         customer.delete()
+        messages.success(request, 'Cliente excluído com sucesso.')
     except models.ProtectedError:
         messages.error(request, 'Não é possível excluir este cliente pois existem vendas associadas a ele.')
     
     if request.htmx:
         customers = Customer.objects.all()
-        return render(request, 'sales/partials/customer_list_rows.html', {'customers': customers})
+        rows_html = render_to_string('sales/partials/customer_list_rows.html', {'customers': customers}, request=request)
+        messages_html = render_to_string('partials/messages.html', {}, request=request)
+        return HttpResponse(rows_html + messages_html)
     return redirect('customer_list')
 
 @login_required
@@ -128,9 +133,12 @@ def sale_delete(request, pk):
             sale.transactions.all().delete()
 
     sale.delete()
+    messages.success(request, 'Venda excluída com sucesso.')
     if request.htmx:
         sales = Sale.objects.all()
-        return render(request, 'sales/partials/sale_list_rows.html', {'sales': sales})
+        rows_html = render_to_string('sales/partials/sale_list_rows.html', {'sales': sales}, request=request)
+        messages_html = render_to_string('partials/messages.html', {}, request=request)
+        return HttpResponse(rows_html + messages_html)
     return redirect('sale_list')
 
 @login_required
@@ -147,6 +155,10 @@ def sale_add_item(request, pk):
 
     if sale.status == 'COMPLETED':
         messages.error(request, 'Não é possível adicionar itens a uma venda finalizada.')
+        if request.htmx:
+            rows_html = render_to_string('sales/partials/sale_items.html', {'sale': sale}, request=request)
+            messages_html = render_to_string('partials/messages.html', {}, request=request)
+            return HttpResponse(rows_html + messages_html)
         return redirect('sale_detail', pk=pk)
 
     if request.method == 'POST':
@@ -160,7 +172,9 @@ def sale_add_item(request, pk):
                 if sale_item.product.stock < sale_item.quantity:
                     messages.error(request, f'Estoque insuficiente para {sale_item.product.name}. Disponível: {sale_item.product.stock}')
                     if request.htmx:
-                        return render(request, 'sales/partials/sale_items.html', {'sale': sale})
+                        rows_html = render_to_string('sales/partials/sale_items.html', {'sale': sale}, request=request)
+                        messages_html = render_to_string('partials/messages.html', {}, request=request)
+                        return HttpResponse(rows_html + messages_html)
                     return redirect('sale_detail', pk=pk)
 
             if sale_item.product:
@@ -175,8 +189,11 @@ def sale_add_item(request, pk):
             sale.total = sum(item.quantity * item.price for item in sale.items.all())
             sale.save()
             
+            messages.success(request, 'Item adicionado com sucesso.')
             if request.htmx:
-                return render(request, 'sales/partials/sale_items.html', {'sale': sale})
+                rows_html = render_to_string('sales/partials/sale_items.html', {'sale': sale}, request=request)
+                messages_html = render_to_string('partials/messages.html', {}, request=request)
+                return HttpResponse(rows_html + messages_html)
     return redirect('sale_detail', pk=pk)
     return redirect('sale_detail', pk=pk)
 
@@ -186,6 +203,10 @@ def sale_remove_item(request, pk, item_pk):
 
     if sale.status == 'COMPLETED':
         messages.error(request, 'Não é possível remover itens de uma venda finalizada.')
+        if request.htmx:
+            rows_html = render_to_string('sales/partials/sale_items.html', {'sale': sale}, request=request)
+            messages_html = render_to_string('partials/messages.html', {}, request=request)
+            return HttpResponse(rows_html + messages_html)
         return redirect('sale_detail', pk=pk)
 
     item = get_object_or_404(SaleItem, pk=item_pk, sale=sale)
@@ -195,8 +216,11 @@ def sale_remove_item(request, pk, item_pk):
     sale.total = sum(item.quantity * item.price for item in sale.items.all())
     sale.save()
     
+    messages.success(request, 'Item removido com sucesso.')
     if request.htmx:
-        return render(request, 'sales/partials/sale_items.html', {'sale': sale})
+        rows_html = render_to_string('sales/partials/sale_items.html', {'sale': sale}, request=request)
+        messages_html = render_to_string('partials/messages.html', {}, request=request)
+        return HttpResponse(rows_html + messages_html)
     return redirect('sale_detail', pk=pk)
 
 @login_required

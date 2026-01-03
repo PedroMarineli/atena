@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Sum
 from django.utils import timezone
@@ -94,8 +97,11 @@ def user_delete(request, pk):
     user = get_object_or_404(User, pk=pk)
     if request.method in ['POST', 'DELETE']:
         user.delete()
+        messages.success(request, 'Usuário excluído com sucesso.')
         if request.htmx:
             users = User.objects.all()
-            return render(request, 'dashboard/partials/user_list_rows.html', {'users': users})
+            rows_html = render_to_string('dashboard/partials/user_list_rows.html', {'users': users}, request=request)
+            messages_html = render_to_string('partials/messages.html', {}, request=request)
+            return HttpResponse(rows_html + messages_html)
         return redirect('user_list')
     return render(request, 'dashboard/user_confirm_delete.html', {'user': user})
