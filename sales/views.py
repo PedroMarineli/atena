@@ -111,6 +111,18 @@ def sale_update(request, pk):
 @require_http_methods(["DELETE", "POST"])
 def sale_delete(request, pk):
     sale = get_object_or_404(Sale, pk=pk)
+    
+    if sale.status == 'COMPLETED':
+        with transaction.atomic():
+            # Restore stock
+            for item in sale.items.all():
+                if item.product:
+                    item.product.stock += item.quantity
+                    item.product.save()
+            
+            # Delete associated transactions
+            sale.transactions.all().delete()
+
     sale.delete()
     if request.htmx:
         sales = Sale.objects.all()
@@ -203,8 +215,9 @@ def sale_finalize(request, pk):
                 description=f"Venda #{sale.id} - {sale.customer.name}",
                 amount=sale.total,
                 type='INCOME',
-                status='PENDING',
+                status='PAID',
                 due_date=timezone.now().date(),
+                paid_date=timezone.now().date(),
                 sale=sale
             )
             
