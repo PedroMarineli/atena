@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Transaction
 from .forms import TransactionForm
+from dashboard.views import is_admin
 
 @login_required
 def transaction_list(request):
@@ -45,6 +46,7 @@ def transaction_update(request, pk):
     return render(request, 'finance/transaction_form.html', {'form': form, 'transaction': transaction})
 
 @login_required
+@user_passes_test(is_admin)
 @require_http_methods(["DELETE", "POST"])
 def transaction_delete(request, pk):
     transaction = get_object_or_404(Transaction, pk=pk)

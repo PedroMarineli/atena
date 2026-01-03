@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from .models import Product, Service, Supplier
 from .forms import ProductForm, ServiceForm, SupplierForm
+from dashboard.views import is_admin
 
 @login_required
 def supplier_list(request):
@@ -49,6 +50,7 @@ def supplier_update(request, pk):
     return render(request, 'inventory/supplier_form.html', context)
 
 @login_required
+@user_passes_test(is_admin)
 @require_http_methods(["DELETE", "POST"])
 def supplier_delete(request, pk):
     supplier = get_object_or_404(Supplier, pk=pk)
@@ -112,6 +114,7 @@ def item_update(request, pk):
     return render(request, 'inventory/item_form.html', context)
 
 @login_required
+@user_passes_test(is_admin)
 @require_http_methods(["DELETE", "POST"])
 def item_delete(request, pk):
     item = get_object_or_404(Product, pk=pk)
@@ -156,6 +159,7 @@ def service_update(request, pk):
     return render(request, 'inventory/item_form.html', context)
 
 @login_required
+@user_passes_test(is_admin)
 @require_http_methods(["DELETE", "POST"])
 def service_delete(request, pk):
     service = get_object_or_404(Service, pk=pk)

@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from django.db import transaction
 from django.utils import timezone
@@ -8,6 +8,7 @@ from django.contrib import messages
 from .models import Sale, SaleItem, Customer
 from .forms import SaleForm, SaleItemForm, CustomerForm
 from finance.models import Transaction
+from dashboard.views import is_admin
 # from inventory.models import Item
 
 @login_required
@@ -53,6 +54,7 @@ def customer_update(request, pk):
     return render(request, 'sales/customer_form.html', context)
 
 @login_required
+@user_passes_test(is_admin)
 @require_http_methods(["DELETE", "POST"])
 def customer_delete(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
@@ -105,6 +107,7 @@ def sale_update(request, pk):
     return render(request, 'sales/sale_form.html', {'form': form, 'sale': sale})
     
 @login_required
+@user_passes_test(is_admin)
 @require_http_methods(["DELETE", "POST"])
 def sale_delete(request, pk):
     sale = get_object_or_404(Sale, pk=pk)
