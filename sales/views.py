@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
-from django.db import transaction
+from django.db import transaction, models
 from django.utils import timezone
 from django.contrib import messages
 from .models import Sale, SaleItem, Customer
@@ -58,7 +58,11 @@ def customer_update(request, pk):
 @require_http_methods(["DELETE", "POST"])
 def customer_delete(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
-    customer.delete()
+    try:
+        customer.delete()
+    except models.ProtectedError:
+        messages.error(request, 'Não é possível excluir este cliente pois existem vendas associadas a ele.')
+    
     if request.htmx:
         customers = Customer.objects.all()
         return render(request, 'sales/partials/customer_list_rows.html', {'customers': customers})
@@ -140,6 +144,11 @@ def sale_detail(request, pk):
 @login_required
 def sale_add_item(request, pk):
     sale = get_object_or_404(Sale, pk=pk)
+
+    if sale.status == 'COMPLETED':
+        messages.error(request, 'Não é possível adicionar itens a uma venda finalizada.')
+        return redirect('sale_detail', pk=pk)
+
     if request.method == 'POST':
         form = SaleItemForm(request.POST)
         if form.is_valid():
@@ -174,6 +183,11 @@ def sale_add_item(request, pk):
 @require_http_methods(["DELETE", "POST"])
 def sale_remove_item(request, pk, item_pk):
     sale = get_object_or_404(Sale, pk=pk)
+
+    if sale.status == 'COMPLETED':
+        messages.error(request, 'Não é possível remover itens de uma venda finalizada.')
+        return redirect('sale_detail', pk=pk)
+
     item = get_object_or_404(SaleItem, pk=item_pk, sale=sale)
     item.delete()
     

@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
+from django.contrib import messages
+from django.db import models
 from .models import Product, Service, Supplier
 from .forms import ProductForm, ServiceForm, SupplierForm
 from dashboard.views import is_admin
@@ -54,7 +56,11 @@ def supplier_update(request, pk):
 @require_http_methods(["DELETE", "POST"])
 def supplier_delete(request, pk):
     supplier = get_object_or_404(Supplier, pk=pk)
-    supplier.delete()
+    try:
+        supplier.delete()
+    except models.ProtectedError:
+        messages.error(request, 'Não é possível excluir este fornecedor pois existem produtos associados a ele.')
+
     if request.htmx:
         suppliers = Supplier.objects.all()
         return render(request, 'inventory/partials/supplier_list_rows.html', {'suppliers': suppliers})
@@ -118,7 +124,11 @@ def item_update(request, pk):
 @require_http_methods(["DELETE", "POST"])
 def item_delete(request, pk):
     item = get_object_or_404(Product, pk=pk)
-    item.delete()
+    try:
+        item.delete()
+    except models.ProtectedError:
+        messages.error(request, 'Não é possível excluir este produto pois existem vendas associadas a ele.')
+
     if request.htmx:
         return render(request, 'inventory/partials/item_list_rows.html', get_inventory_context())
     return redirect('item_list')
@@ -163,7 +173,11 @@ def service_update(request, pk):
 @require_http_methods(["DELETE", "POST"])
 def service_delete(request, pk):
     service = get_object_or_404(Service, pk=pk)
-    service.delete()
+    try:
+        service.delete()
+    except models.ProtectedError:
+        messages.error(request, 'Não é possível excluir este serviço pois existem vendas associadas a ele.')
+
     if request.htmx:
         return render(request, 'inventory/partials/item_list_rows.html', get_inventory_context())
     return redirect('service_list')
