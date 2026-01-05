@@ -3,6 +3,7 @@
     <td class="py-2">{{ product.name }}</td>
     <td class="py-2">{{ product.sku }}</td>
     <td class="py-2">R$ {{ product.price }}</td>
+    <td class="py-2">R$ {{ product.cost_price }}</td>
     <td class="py-2">{{ product.stock }}</td>
     <td class="py-2">
         <button hx-get="{% url 'item_update' product.pk %}" 
