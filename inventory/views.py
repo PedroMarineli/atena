@@ -67,7 +67,8 @@ def supplier_delete(request, pk):
         suppliers = Supplier.objects.all()
         rows_html = render_to_string('inventory/partials/supplier_list_rows.html', {'suppliers': suppliers}, request=request)
         messages_html = render_to_string('partials/messages.html', {}, request=request)
-        return HttpResponse(rows_html + messages_html)
+        final_html = rows_html + f'<tr style="display:none"><td>{messages_html}</td></tr>'
+        return HttpResponse(final_html)
     return redirect('supplier_list')
 
 @login_required
@@ -131,7 +132,8 @@ def item_delete(request, pk):
     if request.htmx:
         rows_html = render_to_string('inventory/partials/product_list_rows.html', {'products': Product.objects.all()}, request=request)
         messages_html = render_to_string('partials/messages.html', {}, request=request)
-        return HttpResponse(rows_html + messages_html)
+        final_html = rows_html + f'<tr style="display:none"><td>{messages_html}</td></tr>'
+        return HttpResponse(final_html)
     return redirect('item_list')
 
 @login_required
@@ -183,5 +185,6 @@ def service_delete(request, pk):
     if request.htmx:
         rows_html = render_to_string('inventory/partials/service_list_rows.html', {'services': Service.objects.all()}, request=request)
         messages_html = render_to_string('partials/messages.html', {}, request=request)
-        return HttpResponse(rows_html + messages_html)
+        final_html = rows_html + f'<tr style="display:none"><td>{messages_html}</td></tr>'
+        return HttpResponse(final_html)
     return redirect('service_list')

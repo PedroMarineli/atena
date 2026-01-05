@@ -59,5 +59,6 @@ def transaction_delete(request, pk):
         transactions = Transaction.objects.all()
         rows_html = render_to_string('finance/partials/transaction_list_rows.html', {'transactions': transactions}, request=request)
         messages_html = render_to_string('partials/messages.html', {}, request=request)
-        return HttpResponse(rows_html + messages_html)
+        final_html = rows_html + f'<tr style="display:none"><td>{messages_html}</td></tr>'
+        return HttpResponse(final_html)
     return redirect('transaction_list')

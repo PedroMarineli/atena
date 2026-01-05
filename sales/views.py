@@ -70,7 +70,13 @@ def customer_delete(request, pk):
         customers = Customer.objects.all()
         rows_html = render_to_string('sales/partials/customer_list_rows.html', {'customers': customers}, request=request)
         messages_html = render_to_string('partials/messages.html', {}, request=request)
-        return HttpResponse(rows_html + messages_html)
+        
+        # SOLUÇÃO DEFINITIVA: 
+        # Envolvemos a mensagem numa <tr> oculta. Isso é HTML válido para um <tbody>.
+        # O HTMX vai encontrar a div "messages" lá dentro, movê-la para o topo e exibir o alerta.
+        final_html = rows_html + f'<tr style="display:none"><td>{messages_html}</td></tr>'
+        
+        return HttpResponse(final_html)
     return redirect('customer_list')
 
 @login_required
@@ -138,7 +144,8 @@ def sale_delete(request, pk):
         sales = Sale.objects.all()
         rows_html = render_to_string('sales/partials/sale_list_rows.html', {'sales': sales}, request=request)
         messages_html = render_to_string('partials/messages.html', {}, request=request)
-        return HttpResponse(rows_html + messages_html)
+        final_html = rows_html + f'<tr style="display:none"><td>{messages_html}</td></tr>'
+        return HttpResponse(final_html)
     return redirect('sale_list')
 
 @login_required

@@ -102,6 +102,7 @@ def user_delete(request, pk):
             users = User.objects.all()
             rows_html = render_to_string('dashboard/partials/user_list_rows.html', {'users': users}, request=request)
             messages_html = render_to_string('partials/messages.html', {}, request=request)
-            return HttpResponse(rows_html + messages_html)
+            final_html = rows_html + f'<tr style="display:none"><td>{messages_html}</td></tr>'
+            return HttpResponse(final_html)
         return redirect('user_list')
     return render(request, 'dashboard/user_confirm_delete.html', {'user': user})
