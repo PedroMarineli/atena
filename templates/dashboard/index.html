@@ -3,27 +3,174 @@
 {% block content %}
     <h1 class="text-3xl font-bold mb-6">Olá, {{ user.get_full_name }}</h1>
     
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- KPIs Section -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-2">Vendas Hoje</h3>
-            <p class="text-3xl font-bold text-accent">R$ {{ sales_today_amount }}</p>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Vendas Hoje</h3>
+            <p class="text-2xl font-bold text-accent">R$ {{ sales_today_amount|floatformat:2 }}</p>
         </div>
         
         <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-2">Pedidos Pendentes</h3>
-            <p class="text-3xl font-bold text-warning">{{ pending_orders_count }}</p>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Ticket Médio (Hoje)</h3>
+            <p class="text-2xl font-bold text-gray-800">R$ {{ average_ticket|floatformat:2 }}</p>
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-2">Estoque Baixo</h3>
-            <p class="text-3xl font-bold text-danger">{{ low_stock_count }}</p>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Pedidos Pendentes</h3>
+            <p class="text-2xl font-bold text-warning">{{ pending_orders_count }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Estoque Baixo</h3>
+            <p class="text-2xl font-bold text-danger">{{ low_stock_count }}</p>
         </div>
         
         {% if user.role == 'ADMIN' %}
         <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-2">Fluxo de Caixa</h3>
-            <p class="text-3xl font-bold text-success">R$ {{ cash_flow }}</p>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Fluxo de Caixa</h3>
+            <p class="text-2xl font-bold {% if cash_flow >= 0 %}text-success{% else %}text-danger{% endif %}">R$ {{ cash_flow|floatformat:2 }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Contas a Receber (7d)</h3>
+            <p class="text-2xl font-bold text-success">R$ {{ receivables|floatformat:2 }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Contas a Pagar (7d)</h3>
+            <p class="text-2xl font-bold text-danger">R$ {{ payables|floatformat:2 }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Valor em Estoque</h3>
+            <p class="text-2xl font-bold text-blue-600">R$ {{ stock_value|floatformat:2 }}</p>
         </div>
         {% endif %}
     </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" x-data="dashboardCharts()" x-init="initCharts()">
+        <!-- Sales Chart -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-4">Vendas (Últimos 30 Dias)</h3>
+            <div class="relative h-64">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Cash Flow Chart -->
+        {% if user.role == 'ADMIN' %}
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-4">Fluxo de Caixa Mensal</h3>
+            <div class="relative h-64">
+                <canvas id="cashFlowChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Top Products Chart -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-4">Top 5 Produtos</h3>
+            <div class="relative h-64">
+                <canvas id="topProductsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Sales Mix Chart -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-4">Mix de Vendas (Qtd)</h3>
+            <div class="relative h-64">
+                <canvas id="mixChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function dashboardCharts() {
+            return {
+                initCharts() {
+                    fetch('{% url "dashboard_charts_data" %}')
+                        .then(response => response.json())
+                        .then(data => {
+                            this.renderSalesChart(data.sales_chart);
+                            {% if user.role == 'ADMIN' %}
+                            this.renderCashFlowChart(data.cash_flow_chart);
+                            {% endif %}
+                            this.renderTopProductsChart(data.top_products_chart);
+                            this.renderMixChart(data.mix_chart);
+                        });
+                },
+                renderSalesChart(data) {
+                    new Chart(document.getElementById('salesChart'), {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Vendas (R$)',
+                                data: data.data,
+                                borderColor: '#4F46E5',
+                                tension: 0.1,
+                                fill: false
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                },
+                renderCashFlowChart(data) {
+                    new Chart(document.getElementById('cashFlowChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: 'Receitas',
+                                    data: data.income,
+                                    backgroundColor: '#10B981'
+                                },
+                                {
+                                    label: 'Despesas',
+                                    data: data.expense,
+                                    backgroundColor: '#EF4444'
+                                }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                },
+                renderTopProductsChart(data) {
+                    new Chart(document.getElementById('topProductsChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Quantidade Vendida',
+                                data: data.data,
+                                backgroundColor: '#F59E0B'
+                            }]
+                        },
+                        options: { 
+                            indexAxis: 'y',
+                            responsive: true, 
+                            maintainAspectRatio: false 
+                        }
+                    });
+                },
+                renderMixChart(data) {
+                    new Chart(document.getElementById('mixChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                data: data.data,
+                                backgroundColor: ['#3B82F6', '#8B5CF6']
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+            }
+        }
+    </script>
 {% endblock %}
