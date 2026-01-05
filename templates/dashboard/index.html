@@ -6,23 +6,23 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-xl font-semibold mb-2">Vendas Hoje</h3>
-            <p class="text-3xl font-bold text-blue-600">R$ {{ sales_today_amount }}</p>
+            <p class="text-3xl font-bold text-accent">R$ {{ sales_today_amount }}</p>
         </div>
         
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-xl font-semibold mb-2">Pedidos Pendentes</h3>
-            <p class="text-3xl font-bold text-orange-600">{{ pending_orders_count }}</p>
+            <p class="text-3xl font-bold text-warning">{{ pending_orders_count }}</p>
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-xl font-semibold mb-2">Estoque Baixo</h3>
-            <p class="text-3xl font-bold text-red-600">{{ low_stock_count }}</p>
+            <p class="text-3xl font-bold text-danger">{{ low_stock_count }}</p>
         </div>
         
         {% if user.role == 'ADMIN' %}
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-xl font-semibold mb-2">Fluxo de Caixa</h3>
-            <p class="text-3xl font-bold text-green-600">R$ {{ cash_flow }}</p>
+            <p class="text-3xl font-bold text-success">R$ {{ cash_flow }}</p>
         </div>
         {% endif %}
     </div>

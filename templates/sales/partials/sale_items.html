@@ -26,14 +26,14 @@
             <td class="py-2">
                 <button hx-delete="{% url 'sale_remove_item' sale.pk item.pk %}" 
                         hx-target="#sale-items-container" 
-                        class="text-red-600 hover:text-red-900">
+                        class="text-danger hover:text-red-700 font-medium transition-colors">
                     Remover
                 </button>
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5" class="py-4 text-center text-gray-500">Nenhum item adicionado.</td>
+            <td colspan="5" class="py-4 text-center text-secondary">Nenhum item adicionado.</td>
         </tr>
         {% endfor %}
     </tbody>

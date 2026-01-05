@@ -8,13 +8,13 @@
         <button hx-get="{% url 'item_update' product.pk %}" 
                 hx-target="#modal-content" 
                 @click="open = true" 
-                class="text-blue-600 hover:text-blue-900 mr-2">
+                class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
             Editar
         </button>
         <button hx-delete="{% url 'item_delete' product.pk %}" 
                 hx-confirm="Tem certeza que deseja excluir este produto?" 
                 hx-target="#item-table-body" 
-                class="text-red-600 hover:text-red-900">
+                class="text-danger hover:text-red-700 font-medium transition-colors">
             Excluir
         </button>
     </td>
