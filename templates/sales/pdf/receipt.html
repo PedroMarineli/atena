@@ -96,6 +96,14 @@
             <img src="file://{{ organization.logo.path }}" style="height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
         {% endif %}
         <h1>{{ organization.name }}</h1>
+        <p>
+            {% if organization.cnpj %}CNPJ: {{ organization.cnpj }} | {% endif %}
+            {% if organization.phone %}Tel: {{ organization.phone }} | {% endif %}
+            {% if organization.email %}Email: {{ organization.email }}{% endif %}
+        </p>
+        {% if organization.address %}
+            <p>{{ organization.address }}</p>
+        {% endif %}
         <p>Comprovante de Venda #{{ sale.id }}</p>
         <p>Data: {{ sale.created_at|date:"d/m/Y H:i" }}</p>
     </div>
@@ -107,9 +115,13 @@
                 <div class="info-cell"><span class="label">Nome:</span> {{ sale.customer.name }}</div>
                 <div class="info-cell"><span class="label">Email:</span> {{ sale.customer.email|default:"-" }}</div>
             </div>
-            {% if sale.customer.phone %}
             <div class="info-row">
-                <div class="info-cell"><span class="label">Telefone:</span> {{ sale.customer.phone }}</div>
+                <div class="info-cell"><span class="label">CPF/CNPJ:</span> {{ sale.customer.document|default:"-" }}</div>
+                <div class="info-cell"><span class="label">Telefone:</span> {{ sale.customer.phone|default:"-" }}</div>
+            </div>
+            {% if sale.customer.address %}
+            <div class="info-row">
+                <div class="info-cell"><span class="label">Endereço:</span> {{ sale.customer.address }} - {{ sale.customer.city|default:"" }}/{{ sale.customer.state|default:"" }}</div>
             </div>
             {% endif %}
         </div>
@@ -128,13 +140,16 @@
             </thead>
             <tbody>
                 {% for item in sale.items.all %}
-                <tr>
-                    <td>
-                        {% if item.product %}
-                            {{ item.product.name }} (Produto)
                         {% elif item.service %}
                             {{ item.service.name }} (Serviço)
                         {% else %}
+                            Item Desconhecido
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        {{ item.quantity }}
+                        {% if item.product %}{{ item.product.get_unit_display }}{% endif %}
+                    
                             Item Desconhecido
                         {% endif %}
                     </td>
@@ -148,6 +163,19 @@
     </div>
 
     <div class="footer">
+        
+        {% if organization.pix_key %}
+        <div style="margin-top: 20px; padding: 10px; border: 1px dashed #333; text-align: center;">
+            <strong>Pague via PIX</strong><br>
+            Chave: {{ organization.pix_key }}
+        </div>
+        {% endif %}
+
+        {% if organization.receipt_footer_text %}
+        <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #666;">
+            {{ organization.receipt_footer_text|linebreaksbr }}
+        </div>
+        {% endif %}
         <div class="total-row">
             Total: R$ {{ sale.total }}
         </div>

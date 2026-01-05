@@ -37,7 +37,7 @@ def index(request):
     cash_flow = income - expenses
 
     # Low Stock Products
-    low_stock_count = Product.objects.filter(stock__lte=5).count()
+    low_stock_count = Product.objects.filter(stock__lte=F('min_stock')).count()
 
     # New KPIs
     # Ticket Médio: (Total Vendas / Qtd Vendas) no período atual (hoje)

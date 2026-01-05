@@ -37,6 +37,12 @@ class User(AbstractUser):
 class Organization(models.Model):
     name = models.CharField(max_length=200, default="Atena")
     logo = models.ImageField(upload_to='company_logo/', null=True, blank=True)
+    cnpj = models.CharField(max_length=20, blank=True, null=True, verbose_name="CNPJ")
+    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefone")
+    email = models.EmailField(blank=True, null=True, verbose_name="Email")
+    address = models.TextField(blank=True, null=True, verbose_name="Endereço")
+    pix_key = models.CharField(max_length=100, blank=True, null=True, verbose_name="Chave PIX")
+    receipt_footer_text = models.TextField(blank=True, null=True, verbose_name="Texto Rodapé Recibo")
 
     def save(self, *args, **kwargs):
         self.pk = 1

@@ -7,6 +7,10 @@ class Customer(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
+    document = models.CharField(max_length=20, blank=True, null=True, verbose_name="CPF/CNPJ")
+    address = models.TextField(blank=True, null=True, verbose_name="Endereço")
+    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Cidade")
+    state = models.CharField(max_length=50, blank=True, null=True, verbose_name="Estado")
     
     def __str__(self):
         return self.name
