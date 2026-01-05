@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white shadow rounded-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Dados da Organização</h2>
+    
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 text-red-700 p-4 rounded mb-4">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div>
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                {{ field.label }}
+            </label>
+            {{ field }}
+            {% if field.help_text %}
+            <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+            {% endif %}
+            {% if field.errors %}
+            <ul class="mt-1 text-sm text-red-600">
+                {% for error in field.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        {% if organization.logo %}
+        <div class="mt-4">
+            <p class="text-sm font-medium text-gray-700 mb-2">Logo Atual:</p>
+            <img src="{{ organization.logo.url }}" alt="Logo Atual" class="h-20 w-auto rounded border p-1">
+        </div>
+        {% endif %}
+
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline">
+                Salvar Configurações
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -33,3 +33,22 @@ class User(AbstractUser):
     role = models.CharField(("Role"), max_length=50, choices=[("ADMIN", "Admin"), ("SELLER", "Seller")], default='SELLER') 
     REQUIRED_FIELDS = []  
     objects = UserManager()
+
+class Organization(models.Model):
+    name = models.CharField(max_length=200, default="Atena")
+    logo = models.ImageField(upload_to='company_logo/', null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(Organization, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def __str__(self):
+        return self.name

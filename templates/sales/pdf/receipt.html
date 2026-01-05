@@ -92,7 +92,10 @@
 </head>
 <body>
     <div class="header">
-        <h1>Atena ERP</h1>
+        {% if organization.logo %}
+            <img src="file://{{ organization.logo.path }}" style="height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
+        {% endif %}
+        <h1>{{ organization.name }}</h1>
         <p>Comprovante de Venda #{{ sale.id }}</p>
         <p>Data: {{ sale.created_at|date:"d/m/Y H:i" }}</p>
     </div>

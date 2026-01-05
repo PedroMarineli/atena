@@ -38,8 +38,11 @@
 <body class="bg-surface flex h-screen overflow-hidden" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <!-- Sidebar -->
     <aside class="w-64 bg-primary text-white flex flex-col shadow-lg">
-        <div class="p-6 bg-primary-dark flex items-center justify-center">
-            <a href="/" class="text-2xl font-bold tracking-wider">Atena</a>
+        <div class="p-6 bg-primary-dark flex flex-col items-center justify-center">
+            {% if organization.logo %}
+                <img src="{{ organization.logo.url }}" alt="{{ organization.name }}" class="h-16 w-auto mb-2 rounded bg-white p-1">
+            {% endif %}
+            <a href="/" class="text-2xl font-bold tracking-wider">{{ organization.name }}</a>
         </div>
         
         <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -55,6 +58,7 @@
             </div>
             <a href="{% url 'transaction_list' %}" class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Financeiro</a>
             <a href="{% url 'user_list' %}" class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Usuários</a>
+            <a href="{% url 'organization_update' %}" class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Configurações</a>
             {% endif %}
         </nav>
 

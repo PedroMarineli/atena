@@ -10,8 +10,8 @@ from django.urls import reverse_lazy, reverse
 from sales.models import Sale, SaleItem
 from finance.models import Transaction
 from inventory.models import Product
-from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import User
+from .forms import CustomUserCreationForm, CustomUserChangeForm, OrganizationForm
+from .models import User, Organization
 import datetime
 
 def is_admin(user):
@@ -235,3 +235,18 @@ def user_delete(request, pk):
             return HttpResponse(final_html)
         return redirect('user_list')
     return render(request, 'dashboard/user_confirm_delete.html', {'user': user})
+
+@login_required
+@user_passes_test(is_admin)
+def organization_update(request):
+    organization = Organization.load()
+    if request.method == 'POST':
+        form = OrganizationForm(request.POST, request.FILES, instance=organization)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Configurações da organização atualizadas com sucesso.')
+            return redirect('organization_update')
+    else:
+        form = OrganizationForm(instance=organization)
+    
+    return render(request, 'dashboard/organization_form.html', {'form': form})

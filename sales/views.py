@@ -283,9 +283,10 @@ def sale_finalize(request, pk):
 @login_required
 def sale_receipt_pdf(request, pk):
     sale = get_object_or_404(Sale, pk=pk)
-    html_string = render_to_string('sales/pdf/receipt.html', {'sale': sale})
+    # Pass request to enable context processors (like organization)
+    html_string = render_to_string('sales/pdf/receipt.html', {'sale': sale}, request=request)
     
-    pdf_file = weasyprint.HTML(string=html_string).write_pdf()
+    pdf_file = weasyprint.HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
     
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="comprovante_venda_{sale.id}.pdf"'
