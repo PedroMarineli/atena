@@ -4,7 +4,12 @@
 <div class="max-w-4xl mx-auto">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Venda #{{ sale.id }}</h2>
-        <a href="{% url 'sale_list' %}" class="text-accent hover:text-accent-hover font-medium transition-colors">Voltar</a>
+        <div class="flex items-center gap-4">
+            <a href="{% url 'sale_receipt_pdf' sale.pk %}" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                Baixar Comprovante
+            </a>
+            <a href="{% url 'sale_list' %}" class="text-accent hover:text-accent-hover font-medium transition-colors">Voltar</a>
+        </div>
     </div>
 
     <div class="bg-white shadow rounded-lg p-6 mb-6">

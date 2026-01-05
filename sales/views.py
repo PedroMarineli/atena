@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+import weasyprint
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
@@ -278,3 +279,14 @@ def sale_finalize(request, pk):
         messages.error(request, f'Erro ao finalizar venda: {str(e)}')
         
     return redirect('sale_detail', pk=pk)
+
+@login_required
+def sale_receipt_pdf(request, pk):
+    sale = get_object_or_404(Sale, pk=pk)
+    html_string = render_to_string('sales/pdf/receipt.html', {'sale': sale})
+    
+    pdf_file = weasyprint.HTML(string=html_string).write_pdf()
+    
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="comprovante_venda_{sale.id}.pdf"'
+    return response
