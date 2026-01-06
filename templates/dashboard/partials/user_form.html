@@ -1,6 +1,7 @@
 <form hx-post="{{ submit_url }}" 
-      hx-target="#user-table-body" 
-      @submit="open = false">
+      hx-target="#modal-content" 
+      hx-swap="innerHTML">
+    
     <div class="mb-4">
         <h3 class="text-lg font-bold">{{ modal_title }}</h3>
     </div>
@@ -16,10 +17,20 @@
             <p class="text-secondary text-xs">{{ field.help_text }}</p>
             {% endif %}
             {% if field.errors %}
-            <p class="text-danger text-xs italic">{{ field.errors.0 }}</p>
+                {% for error in field.errors %}
+                <p class="text-danger text-xs italic mt-1">{{ error }}</p>
+                {% endfor %}
             {% endif %}
         </div>
         {% endfor %}
+        
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 text-red-700 p-2 rounded text-sm">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 
     <div class="mt-4 flex justify-end">

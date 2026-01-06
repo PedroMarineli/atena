@@ -140,6 +140,10 @@
             </thead>
             <tbody>
                 {% for item in sale.items.all %}
+                <tr>
+                    <td>
+                        {% if item.product %}
+                            {{ item.product.name }} (Produto)
                         {% elif item.service %}
                             {{ item.service.name }} (Serviço)
                         {% else %}
@@ -149,11 +153,7 @@
                     <td class="text-right">
                         {{ item.quantity }}
                         {% if item.product %}{{ item.product.get_unit_display }}{% endif %}
-                    
-                            Item Desconhecido
-                        {% endif %}
                     </td>
-                    <td class="text-right">{{ item.quantity }}</td>
                     <td class="text-right">R$ {{ item.price }}</td>
                     <td class="text-right">R$ {% widthratio item.quantity 1 item.price %}</td>
                 </tr>
@@ -182,7 +182,7 @@
     </div>
 
     <div class="seller-info">
-        <p>Vendedor Responsável: {{ sale.seller.email }}</p>
+        <p>Vendedor Responsável: {{ sale.seller.get_full_name|default:sale.seller.email }}</p>
         <p>Obrigado pela preferência!</p>
     </div>
 </body>

@@ -188,9 +188,25 @@ def user_create(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Usuário criado com sucesso.')
+            
             if request.htmx:
+                # 1. Renderiza as linhas da tabela atualizadas
                 users = User.objects.all()
-                return render(request, 'dashboard/partials/user_list_rows.html', {'users': users})
+                rows_html = render_to_string('dashboard/partials/user_list_rows.html', {'users': users}, request=request)
+                
+                # 2. Renderiza as mensagens (toast)
+                messages_html = render_to_string('partials/messages.html', {}, request=request)
+                
+                # 3. Monta a resposta com OOB (Out of Band) Swap
+                # Atualiza a tabela (#user-table-body) e insere as mensagens (#messages)
+                response_content = f'<tbody id="user-table-body" hx-swap-oob="innerHTML">{rows_html}</tbody>{messages_html}'
+                
+                response = HttpResponse(response_content)
+                # 4. Trigger para fechar o modal via Alpine.js
+                response['HX-Trigger'] = 'close-modal'
+                return response
+                
             return redirect('user_list')
     else:
         form = CustomUserCreationForm()
@@ -208,9 +224,19 @@ def user_update(request, pk):
         form = CustomUserChangeForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Usuário atualizado com sucesso.')
+            
             if request.htmx:
                 users = User.objects.all()
-                return render(request, 'dashboard/partials/user_list_rows.html', {'users': users})
+                rows_html = render_to_string('dashboard/partials/user_list_rows.html', {'users': users}, request=request)
+                messages_html = render_to_string('partials/messages.html', {}, request=request)
+                
+                response_content = f'<tbody id="user-table-body" hx-swap-oob="innerHTML">{rows_html}</tbody>{messages_html}'
+                
+                response = HttpResponse(response_content)
+                response['HX-Trigger'] = 'close-modal'
+                return response
+                
             return redirect('user_list')
     else:
         form = CustomUserChangeForm(instance=user)
