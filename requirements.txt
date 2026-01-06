@@ -2,3 +2,7 @@ Django>=5.1
 pytest-django
 psycopg2-binary
 weasyprint
+python-decouple
+gunicorn
+whitenoise
+dj-database-url
