@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atena-django
+  namespace: atena
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: atena-django
+  template:
+    metadata:
+      labels:
+        app: atena-django
+    spec:
+      containers:
+        - name: django
+          # Update this image name to your actual image repository if pushing to a registry
+          image: pedromarineli/atena:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: atena-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5

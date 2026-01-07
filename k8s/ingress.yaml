@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: atena-ingress
+  namespace: atena
+  annotations:
+    # Use traefik as default ingress controller in k3s
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: atena-django
+                port:
+                  number: 80
