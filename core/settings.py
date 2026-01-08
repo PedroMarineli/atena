@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'inventory',
     'sales',
     'finance',
+    'core',
 ]
 
 # Middleware configuration

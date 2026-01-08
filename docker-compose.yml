@@ -1,0 +1,44 @@
+services:
+  atena-postgres:
+    image: postgres:15
+    container_name: atena-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: atena
+      POSTGRES_USER: atena
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U atena" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  atena-django:
+    image: pedromarineli/atena:latest
+    container_name: atena-django
+    restart: always
+    ports:
+      - "8888:8000"
+    environment:
+      SECRET_KEY: "django-insecure-change-me-in-production"
+      DEBUG: "False"
+      ALLOWED_HOSTS: "*"
+      DATABASE_URL: "postgres://atena:password@atena-postgres:5432/atena"
+      # Configurações para HTTP (Disable SSL)
+      SECURE_SSL_REDIRECT: "False"
+      SESSION_COOKIE_SECURE: "False"
+      CSRF_COOKIE_SECURE: "False"
+      CSRF_TRUSTED_ORIGINS: "http://localhost:8888"
+    depends_on:
+      atena-postgres:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate &&
+             python manage.py createauthuser &&
+             gunicorn --bind 0.0.0.0:8000 core.wsgi:application"
+
+volumes:
+  postgres-data:
