@@ -22,8 +22,7 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ item.quantity }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {{ item.price }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {% widthratio item.price 1 item.quantity
-                %}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {{ item.subtotal }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button hx-delete="{% url 'sale_remove_item' sale.pk item.pk %}" hx-target="#sale-items-container"
                     class="text-danger hover:text-red-700 font-medium transition-colors">

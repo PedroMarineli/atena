@@ -1,12 +1,10 @@
-<form hx-post="{{ submit_url }}" 
-      hx-target="#item-table-body" 
-      @submit="open = false">
+<form hx-post="{{ submit_url }}" @submit="open = false">
     <div class="mb-4">
         <h3 class="text-lg font-bold">{{ modal_title }}</h3>
     </div>
-    
+
     {% csrf_token %}
-    
+
     <div class="grid grid-cols-1 gap-4">
         {% for field in form %}
         <div>
@@ -20,10 +18,12 @@
     </div>
 
     <div class="mt-4 flex justify-end">
-        <button type="button" @click="open = false" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded mr-2 transition-colors">
+        <button type="button" @click="open = false"
+            class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded mr-2 transition-colors">
             Cancelar
         </button>
-        <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-4 rounded transition-colors">
+        <button type="submit"
+            class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-4 rounded transition-colors">
             Salvar
         </button>
     </div>

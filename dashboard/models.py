@@ -27,16 +27,16 @@ class UserManager(BaseUserManager):
 
 # Classe de usuário personalizada
 class User(AbstractUser):
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, verbose_name="E-mail")
     USERNAME_FIELD = 'email'
     username = None
-    role = models.CharField(("Role"), max_length=50, choices=[("ADMIN", "Admin"), ("SELLER", "Seller")], default='SELLER') 
+    role = models.CharField(verbose_name="Cargo", max_length=50, choices=[("ADMIN", "Administrador"), ("SELLER", "Vendedor")], default='SELLER') 
     REQUIRED_FIELDS = []  
     objects = UserManager()
 
 class Organization(models.Model):
-    name = models.CharField(max_length=200, default="Atena")
-    logo = models.ImageField(upload_to='company_logo/', null=True, blank=True)
+    name = models.CharField(max_length=200, default="Atena", verbose_name="Nome da Organização")
+    logo = models.ImageField(upload_to='company_logo/', null=True, blank=True, verbose_name="Logotipo")
     cnpj = models.CharField(max_length=20, blank=True, null=True, verbose_name="CNPJ")
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefone")
     email = models.EmailField(blank=True, null=True, verbose_name="Email")

@@ -53,6 +53,8 @@
                 class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Clientes</a>
             <a href="{% url 'supplier_list' %}"
                 class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Fornecedores</a>
+            <a href="{% url 'category_list' %}"
+                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Categorias</a>
             <a href="{% url 'item_list' %}"
                 class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Produtos</a>
             <a href="{% url 'service_list' %}"
@@ -74,13 +76,16 @@
         </nav>
 
         <div class="p-4 bg-primary-dark">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-2">
                 <span class="text-sm truncate mr-2">{{ user.get_full_name }}</span>
                 <form action="{% url 'logout' %}" method="post" class="inline">
                     {% csrf_token %}
                     <button type="submit"
                         class="text-danger hover:text-red-300 text-sm font-medium transition-colors">Sair</button>
                 </form>
+            </div>
+            <div class="text-xs text-secondary text-right border-t border-slate-700 pt-2">
+                {{ system_version }}
             </div>
         </div>
     </aside>

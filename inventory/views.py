@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from django.contrib import messages
 from django.db import models
-from .models import Product, Service, Supplier
-from .forms import ProductForm, ServiceForm, SupplierForm
+from .models import Product, Service, Supplier, Category
+from .forms import ProductForm, ServiceForm, SupplierForm, CategoryForm
 from dashboard.views import is_admin
 
 @login_required
@@ -73,9 +73,80 @@ def supplier_delete(request, pk):
 
 @login_required
 def item_list(request):
-    context = {'products': Product.objects.all()}
+    context = {'products': Product.objects.select_related('category', 'supplier').all()}
     context['page_title'] = 'Produtos'
     return render(request, 'inventory/product_list.html', context)
+
+@login_required
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'inventory/category_list.html', {'categories': categories})
+
+@login_required
+def category_create(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            if request.htmx:
+                categories = Category.objects.all()
+                rows_html = render_to_string('inventory/partials/category_list_rows.html', {'categories': categories}, request=request)
+                messages_html = render_to_string('partials/messages.html', {}, request=request)
+                response_content = f'<tbody id="category-table-body" hx-swap-oob="innerHTML">{rows_html}</tbody>{messages_html}'
+                response = HttpResponse(response_content)
+                response['HX-Trigger'] = 'close-modal'
+                return response
+            return redirect('category_list')
+    else:
+        form = CategoryForm()
+    
+    context = {'form': form, 'submit_url': reverse('category_create'), 'modal_title': 'Nova Categoria'}
+    if request.htmx:
+        return render(request, 'inventory/partials/item_form.html', context)
+    return render(request, 'inventory/item_form.html', context)
+
+@login_required
+def category_update(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            if request.htmx:
+                categories = Category.objects.all()
+                rows_html = render_to_string('inventory/partials/category_list_rows.html', {'categories': categories}, request=request)
+                messages_html = render_to_string('partials/messages.html', {}, request=request)
+                response_content = f'<tbody id="category-table-body" hx-swap-oob="innerHTML">{rows_html}</tbody>{messages_html}'
+                response = HttpResponse(response_content)
+                response['HX-Trigger'] = 'close-modal'
+                return response
+            return redirect('category_list')
+    else:
+        form = CategoryForm(instance=category)
+    
+    context = {'form': form, 'submit_url': reverse('category_update', args=[pk]), 'modal_title': 'Editar Categoria'}
+    if request.htmx:
+        return render(request, 'inventory/partials/item_form.html', context)
+    return render(request, 'inventory/item_form.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+@require_http_methods(["DELETE", "POST"])
+def category_delete(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    try:
+        category.delete()
+        messages.success(request, 'Categoria excluída com sucesso.')
+    except models.ProtectedError:
+        messages.error(request, 'Não é possível excluir esta categoria pois existem produtos associados a ela.')
+
+    if request.htmx:
+        categories = Category.objects.all()
+        rows_html = render_to_string('inventory/partials/category_list_rows.html', {'categories': categories}, request=request)
+        messages_html = render_to_string('partials/messages.html', {}, request=request)
+        final_html = rows_html + f'<tr style="display:none"><td>{messages_html}</td></tr>'
+        return HttpResponse(final_html)
+    return redirect('category_list')
 
 @login_required
 def service_list(request):
@@ -90,7 +161,12 @@ def item_create(request):
         if form.is_valid():
             form.save()
             if request.htmx:
-                return render(request, 'inventory/partials/product_list_rows.html', {'products': Product.objects.all()})
+                rows_html = render_to_string('inventory/partials/product_list_rows.html', {'products': Product.objects.select_related('category', 'supplier').all()}, request=request)
+                messages_html = render_to_string('partials/messages.html', {}, request=request)
+                response_content = f'<tbody id="item-table-body" hx-swap-oob="innerHTML">{rows_html}</tbody>{messages_html}'
+                response = HttpResponse(response_content)
+                response['HX-Trigger'] = 'close-modal'
+                return response
             return redirect('item_list')
     else:
         form = ProductForm()
@@ -108,7 +184,12 @@ def item_update(request, pk):
         if form.is_valid():
             form.save()
             if request.htmx:
-                return render(request, 'inventory/partials/product_list_rows.html', {'products': Product.objects.all()})
+                rows_html = render_to_string('inventory/partials/product_list_rows.html', {'products': Product.objects.select_related('category', 'supplier').all()}, request=request)
+                messages_html = render_to_string('partials/messages.html', {}, request=request)
+                response_content = f'<tbody id="item-table-body" hx-swap-oob="innerHTML">{rows_html}</tbody>{messages_html}'
+                response = HttpResponse(response_content)
+                response['HX-Trigger'] = 'close-modal'
+                return response
             return redirect('item_list')
     else:
         form = ProductForm(instance=item)

@@ -9,6 +9,7 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - atena-media:/app/media
     ports:
       - "5432:5432"
     healthcheck:
@@ -45,3 +46,4 @@ services:
 
 volumes:
   postgres-data:
+  atena-media:
