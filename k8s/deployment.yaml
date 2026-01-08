@@ -13,6 +13,14 @@ spec:
       labels:
         app: atena-django
     spec:
+      initContainers:
+        - name: migrate
+          image: pedromarineli/atena:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "manage.py", "migrate"]
+          envFrom:
+            - secretRef:
+                name: atena-secrets
       containers:
         - name: django
           # Update this image name to your actual image repository if pushing to a registry
@@ -24,16 +32,16 @@ spec:
             - secretRef:
                 name: atena-secrets
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: 8000
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
+            failureThreshold: 5
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: 8000
-            initialDelaySeconds: 120
+            initialDelaySeconds: 60
             periodSeconds: 20
             timeoutSeconds: 5
+            failureThreshold: 5
