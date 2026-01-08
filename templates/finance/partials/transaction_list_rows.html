@@ -1,22 +1,20 @@
 {% for transaction in transactions %}
-<tr class="border-b last:border-0">
-    <td class="py-2">{{ transaction.description }}</td>
-    <td class="py-2">R$ {{ transaction.amount }}</td>
-    <td class="py-2">{{ transaction.get_type_display }}</td>
-    <td class="py-2">{{ transaction.get_status_display }}</td>
-    <td class="py-2">{{ transaction.due_date|date:"d/m/Y" }}</td>
-    <td class="py-2">{{ transaction.paid_date|date:"d/m/Y"|default:"-" }}</td>
-    <td class="py-2">
-        <button hx-get="{% url 'transaction_update' transaction.pk %}" 
-                hx-target="#modal-content" 
-                @click="open = true" 
-                class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
+<tr class="hover:bg-slate-50 transition-colors">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.description }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {{ transaction.amount }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.get_type_display }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.get_status_display }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.due_date|date:"d/m/Y" }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.paid_date|date:"d/m/Y"|default:"-" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+        <button hx-get="{% url 'transaction_update' transaction.pk %}" hx-target="#modal-content" @click="open = true"
+            class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
             Editar
         </button>
-        <button hx-delete="{% url 'transaction_delete' transaction.pk %}" 
-                hx-confirm="Tem certeza que deseja excluir esta transação?" 
-                hx-target="#transaction-table-body" 
-                class="text-danger hover:text-red-700 font-medium transition-colors">
+        <button hx-delete="{% url 'transaction_delete' transaction.pk %}"
+            hx-confirm="Tem certeza que deseja excluir esta transação?" hx-target="#transaction-table-body"
+            class="text-danger hover:text-red-700 font-medium transition-colors">
             Excluir
         </button>
     </td>

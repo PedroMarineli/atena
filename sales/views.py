@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-import weasyprint
+
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
@@ -286,8 +286,16 @@ def sale_receipt_pdf(request, pk):
     # Pass request to enable context processors (like organization)
     html_string = render_to_string('sales/pdf/receipt.html', {'sale': sale}, request=request)
     
-    pdf_file = weasyprint.HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
-    
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="comprovante_venda_{sale.id}.pdf"'
-    return response
+    try:
+        import weasyprint
+        pdf_file = weasyprint.HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
+        
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="comprovante_venda_{sale.id}.pdf"'
+        return response
+    except OSError:
+        messages.error(request, "A geração de PDF não está disponível no ambiente local (bibliotecas GTK ausentes).")
+        return redirect('sale_detail', pk=pk)
+    except Exception as e:
+        messages.error(request, f"Erro ao gerar PDF: {str(e)}")
+        return redirect('sale_detail', pk=pk)

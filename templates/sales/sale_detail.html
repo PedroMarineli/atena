@@ -5,14 +5,16 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Venda #{{ sale.id }}</h2>
         <div class="flex items-center gap-4">
-            <a href="{% url 'sale_receipt_pdf' sale.pk %}" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors">
+            <a href="{% url 'sale_receipt_pdf' sale.pk %}" target="_blank"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors">
                 Baixar Comprovante
             </a>
-            <a href="{% url 'sale_list' %}" class="text-accent hover:text-accent-hover font-medium transition-colors">Voltar</a>
+            <a href="{% url 'sale_list' %}"
+                class="text-accent hover:text-accent-hover font-medium transition-colors">Voltar</a>
         </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
+    <div class="bg-white shadow-md rounded-xl border border-slate-200 p-6 mb-6">
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <p class="text-secondary">Cliente:</p>
@@ -33,11 +35,12 @@
         </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white shadow-md rounded-xl border border-slate-200 p-6">
         <h3 class="text-xl font-bold mb-4">Itens</h3>
-        
+
         <div class="mb-4">
-            <form hx-post="{% url 'sale_add_item' sale.pk %}" hx-target="#sale-items-container" class="flex gap-2 items-end flex-wrap">
+            <form hx-post="{% url 'sale_add_item' sale.pk %}" hx-target="#sale-items-container"
+                class="flex gap-2 items-end flex-wrap">
                 {% csrf_token %}
                 <div class="flex-grow min-w-[200px]">
                     <label class="block text-sm font-medium text-primary-light">Produto</label>
@@ -51,7 +54,8 @@
                     <label class="block text-sm font-medium text-primary-light">Qtd</label>
                     {{ form.quantity }}
                 </div>
-                <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-4 rounded transition-colors">
+                <button type="submit"
+                    class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-4 rounded transition-colors">
                     Adicionar
                 </button>
             </form>
@@ -66,7 +70,9 @@
         {% if sale.status == 'PENDING' %}
         <form action="{% url 'sale_finalize' sale.pk %}" method="post">
             {% csrf_token %}
-            <button type="submit" class="bg-success hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition-colors" onclick="return confirm('Tem certeza que deseja finalizar esta venda? Isso irá baixar o estoque e gerar uma transação financeira.')">
+            <button type="submit"
+                class="bg-success hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition-colors"
+                onclick="return confirm('Tem certeza que deseja finalizar esta venda? Isso irá baixar o estoque e gerar uma transação financeira.')">
                 Finalizar Venda
             </button>
         </form>

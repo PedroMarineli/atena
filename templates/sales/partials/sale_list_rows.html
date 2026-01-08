@@ -1,23 +1,20 @@
 {% for sale in sales %}
-<tr class="border-b last:border-0">
-    <td class="py-2">#{{ sale.id }}</td>
-    <td class="py-2">{{ sale.customer.name }}</td>
-    <td class="py-2">{{ sale.seller.email }}</td>
-    <td class="py-2">{{ sale.created_at|date:"d/m/Y H:i" }}</td>
-    <td class="py-2">R$ {{ sale.total }}</td>
-    <td class="py-2">{{ sale.get_status_display }}</td>
-    <td class="py-2">
-        <a href="{% url 'sale_detail' sale.pk %}" class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">Detalhes</a>
-        <button hx-get="{% url 'sale_update' sale.pk %}" 
-                hx-target="#modal-content" 
-                @click="open = true" 
-                class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
+<tr class="hover:bg-slate-50 transition-colors">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">#{{ sale.id }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ sale.customer.name }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ sale.seller.email }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ sale.created_at|date:"d/m/Y H:i" }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {{ sale.total }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ sale.get_status_display }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+        <a href="{% url 'sale_detail' sale.pk %}"
+            class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">Detalhes</a>
+        <button hx-get="{% url 'sale_update' sale.pk %}" hx-target="#modal-content" @click="open = true"
+            class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
             Editar
         </button>
-        <button hx-delete="{% url 'sale_delete' sale.pk %}" 
-                hx-confirm="Tem certeza que deseja excluir esta venda?" 
-                hx-target="#sale-table-body" 
-                class="text-danger hover:text-red-700 font-medium transition-colors">
+        <button hx-delete="{% url 'sale_delete' sale.pk %}" hx-confirm="Tem certeza que deseja excluir esta venda?"
+            hx-target="#sale-table-body" class="text-danger hover:text-red-700 font-medium transition-colors">
             Excluir
         </button>
     </td>

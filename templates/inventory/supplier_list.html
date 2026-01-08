@@ -4,22 +4,24 @@
 <div x-data="{ open: false }">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Fornecedores</h2>
-        <button hx-get="{% url 'supplier_create' %}" 
-                hx-target="#modal-content" 
-                @click="open = true" 
-                class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-4 rounded transition-colors">
+        <button hx-get="{% url 'supplier_create' %}" hx-target="#modal-content" @click="open = true"
+            class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-4 rounded transition-colors">
             Novo Fornecedor
         </button>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-4">
-        <table class="w-full">
-            <thead>
-                <tr class="text-left border-b">
-                    <th class="pb-2">Nome</th>
-                    <th class="pb-2">Email</th>
-                    <th class="pb-2">Telefone</th>
-                    <th class="pb-2">Ações</th>
+    <div class="bg-white shadow-md rounded-xl border border-slate-200 p-6">
+        <table class="w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nome
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Email
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Telefone
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ações
+                    </th>
                 </tr>
             </thead>
             <tbody id="supplier-table-body">
@@ -29,16 +31,11 @@
     </div>
 
     <!-- Modal -->
-    <div x-show="open" 
-         class="fixed inset-0 bg-slate-900/50 overflow-y-auto h-full w-full backdrop-blur-sm"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         style="display: none;">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div x-show="open" class="fixed inset-0 bg-slate-900/50 overflow-y-auto h-full w-full backdrop-blur-sm"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;">
+        <div class="relative top-20 mx-auto p-5 border border-slate-200 w-96 shadow-xl rounded-xl bg-white">
             <div id="modal-content">
                 <!-- Content loaded via HTMX -->
             </div>

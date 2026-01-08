@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,33 +9,34 @@
     <script>
         tailwind.config = {
             theme: {
-            extend: {
-                colors: {
-                primary: {
-                    DEFAULT: '#1e293b', // Slate 800
-                    light: '#334155',   // Slate 700
-                    dark: '#0f172a',    // Slate 900
-                },
-                secondary: {
-                    DEFAULT: '#64748b', // Slate 500
-                    light: '#94a3b8',   // Slate 400
-                },
-                accent: {
-                    DEFAULT: '#2563eb', // Blue 600
-                    hover: '#1d4ed8',   // Blue 700
-                },
-                surface: '#f8fafc',     // Slate 50
-                danger: '#ef4444',      // Red 500
-                success: '#22c55e',     // Green 500
-                warning: '#f59e0b',     // Amber 500
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#1e293b', // Slate 800
+                            light: '#334155',   // Slate 700
+                            dark: '#0f172a',    // Slate 900
+                        },
+                        secondary: {
+                            DEFAULT: '#64748b', // Slate 500
+                            light: '#94a3b8',   // Slate 400
+                        },
+                        accent: {
+                            DEFAULT: '#2563eb', // Blue 600
+                            hover: '#1d4ed8',   // Blue 700
+                        },
+                        surface: '#f8fafc',     // Slate 50
+                        danger: '#ef4444',      // Red 500
+                        success: '#22c55e',     // Green 500
+                        warning: '#f59e0b',     // Amber 500
+                    }
                 }
-            }
             }
         }
     </script>
 </head>
+
 <body class="bg-surface h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border border-slate-200">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-primary-dark">Atena</h1>
             <p class="text-secondary">Faça login para continuar</p>
@@ -42,7 +44,7 @@
 
         <form method="post" class="space-y-6">
             {% csrf_token %}
-            
+
             {% if form.errors %}
             <div class="bg-red-50 border border-red-200 text-danger px-4 py-3 rounded relative" role="alert">
                 <strong class="font-bold">Erro!</strong>
@@ -51,29 +53,31 @@
             {% endif %}
 
             <div>
-                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-primary-light">Email</label>
-                <input type="text" name="username" id="{{ form.username.id_for_label }}" required
-                    class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                    focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent
-                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                    invalid:border-pink-500 invalid:text-pink-600
-                    focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                <label for="{{ form.username.id_for_label }}"
+                    class="block text-sm font-medium text-primary-light">Email</label>
+                <input type="text" name="username" id="{{ form.username.id_for_label }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent
+                disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                invalid:border-pink-500 invalid:text-pink-600
+                focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
             </div>
 
             <div>
-                <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-primary-light">Senha</label>
-                <input type="password" name="password" id="{{ form.password.id_for_label }}" required
-                    class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                    focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent
-                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                    invalid:border-pink-500 invalid:text-pink-600
-                    focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                <label for="{{ form.password.id_for_label }}"
+                    class="block text-sm font-medium text-primary-light">Senha</label>
+                <input type="password" name="password" id="{{ form.password.id_for_label }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent
+                disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                invalid:border-pink-500 invalid:text-pink-600
+                focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
             </div>
 
-            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors">
+            <button type="submit"
+                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors">
                 Entrar
             </button>
         </form>
     </div>
 </body>
+
 </html>

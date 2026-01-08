@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white shadow rounded-lg p-6">
+<div class="max-w-2xl mx-auto bg-white shadow-md rounded-xl border border-slate-200 p-6">
     <h2 class="text-2xl font-bold mb-6 text-gray-800">Dados da Organização</h2>
-    
+
     <form method="post" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
-        
+
         {% if form.non_field_errors %}
         <div class="bg-red-50 text-red-700 p-4 rounded mb-4">
             {{ form.non_field_errors }}
@@ -31,7 +31,7 @@
             {% endif %}
         </div>
         {% endfor %}
-        
+
         {% if organization.logo %}
         <div class="mt-4">
             <p class="text-sm font-medium text-gray-700 mb-2">Logo Atual:</p>
@@ -40,7 +40,8 @@
         {% endif %}
 
         <div class="flex justify-end pt-4">
-            <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline">
+            <button type="submit"
+                class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline">
                 Salvar Configurações
             </button>
         </div>
