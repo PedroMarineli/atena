@@ -1,22 +1,93 @@
 {% for transaction in transactions %}
-<tr class="hover:bg-slate-50 transition-colors">
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.description }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {{ transaction.amount }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.get_type_display }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.get_status_display }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.due_date|date:"d/m/Y" }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ transaction.paid_date|date:"d/m/Y"|default:"-" }}
+<tr class="hover:bg-slate-50/75 transition-colors group">
+    <td class="py-4 px-6">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg {% if transaction.type == 'INCOME' %}bg-emerald-50 text-emerald-600 border border-emerald-100{% else %}bg-rose-50 text-rose-600 border border-rose-100{% endif %} flex items-center justify-center shrink-0">
+                {% if transaction.type == 'INCOME' %}
+                    <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+                {% else %}
+                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                {% endif %}
+            </div>
+            <div>
+                <span class="font-medium text-slate-900 block">{{ transaction.description }}</span>
+                {% if transaction.sale %}
+                <span class="text-xs text-brand-600 inline-flex items-center gap-1 mt-0.5">
+                    <i data-lucide="receipt" class="w-3 h-3"></i>
+                    Venda #{{ transaction.sale.id }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button hx-get="{% url 'transaction_update' transaction.pk %}" hx-target="#modal-content" @click="open = true"
-            class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
-            Editar
-        </button>
-        <button hx-delete="{% url 'transaction_delete' transaction.pk %}"
-            hx-confirm="Tem certeza que deseja excluir esta transação?" hx-target="#transaction-table-body"
-            class="text-danger hover:text-red-700 font-medium transition-colors">
-            Excluir
-        </button>
+    <td class="py-4 px-6">
+        {% if transaction.type == 'INCOME' %}
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <i data-lucide="trending-up" class="w-3 h-3 text-emerald-500"></i>
+            Receita
+        </span>
+        {% else %}
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+            <i data-lucide="trending-down" class="w-3 h-3 text-rose-500"></i>
+            Despesa
+        </span>
+        {% endif %}
+    </td>
+    <td class="py-4 px-6 text-right font-medium font-mono text-sm">
+        {% if transaction.type == 'INCOME' %}
+            <span class="text-emerald-600 font-semibold">+ R$ {{ transaction.amount|floatformat:2 }}</span>
+        {% else %}
+            <span class="text-rose-600 font-semibold">- R$ {{ transaction.amount|floatformat:2 }}</span>
+        {% endif %}
+    </td>
+    <td class="py-4 px-6 text-center">
+        {% if transaction.status == 'PAID' %}
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-500"></i>
+            Pago
+        </span>
+        {% else %}
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+            <i data-lucide="clock" class="w-3 h-3 text-amber-500"></i>
+            Pendente
+        </span>
+        {% endif %}
+    </td>
+    <td class="py-4 px-6 text-slate-600 text-xs font-mono">
+        {{ transaction.due_date|date:"d/m/Y" }}
+    </td>
+    <td class="py-4 px-6 text-slate-600 text-xs font-mono">
+        {{ transaction.paid_date|date:"d/m/Y"|default:"-" }}
+    </td>
+    <td class="py-4 px-6 text-right">
+        <div class="flex items-center justify-end gap-1.5">
+            <button hx-get="{% url 'transaction_update' transaction.pk %}" 
+                    hx-target="#modal-content" 
+                    @click="open = true" 
+                    title="Editar Transação"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+            </button>
+            <button hx-delete="{% url 'transaction_delete' transaction.pk %}" 
+                    hx-confirm="Tem certeza que deseja excluir esta transação?" 
+                    hx-target="#transaction-table-body" 
+                    title="Excluir Transação"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class="py-12 px-6 text-center text-slate-500">
+        <div class="flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                <i data-lucide="wallet" class="w-6 h-6"></i>
+            </div>
+            <p class="font-medium text-slate-700">Nenhuma transação registrada</p>
+            <p class="text-xs text-slate-400 mt-1">Registre despesas e receitas para acompanhar a saúde financeira do negócio.</p>
+        </div>
     </td>
 </tr>
 {% endfor %}

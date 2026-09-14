@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
+{% block breadcrumb %}Nova Venda{% endblock %}
+
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white shadow-md rounded-xl border border-slate-200 p-6">
-    {% include 'sales/partials/sale_form.html' %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white border border-slate-200/80 shadow-soft rounded-2xl p-6 sm:p-8">
+        {% include 'sales/partials/sale_form.html' %}
+    </div>
 </div>
 {% endblock %}

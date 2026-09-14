@@ -6,184 +6,315 @@
     <style>
         @page {
             size: A4;
-            margin: 2cm;
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                font-size: 8pt;
+                color: #94a3b8;
+            }
+        }
+        * {
+            box-sizing: border-box;
         }
         body {
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.4;
-            color: #333;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
-        .header h1 {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.5;
+            color: #1e293b;
             margin: 0;
-            font-size: 24px;
-            color: #000;
+            padding: 0;
         }
-        .header p {
-            margin: 5px 0;
-            color: #666;
+        .header-table {
+            width: 100%;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
         }
-        .info-section {
-            margin-bottom: 20px;
+        .org-name {
+            font-size: 16pt;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 4px 0;
         }
-        .info-section h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+        .org-meta {
+            font-size: 8pt;
+            color: #64748b;
+            line-height: 1.4;
         }
-        .info-grid {
-            display: table;
+        .receipt-badge-box {
+            text-align: right;
+        }
+        .receipt-title {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #4f46e5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+        .receipt-number {
+            font-size: 11pt;
+            font-weight: 600;
+            color: #334155;
+            margin: 2px 0;
+        }
+        .receipt-date {
+            font-size: 8pt;
+            color: #64748b;
+        }
+
+        .customer-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+        .card-grid {
             width: 100%;
         }
-        .info-row {
-            display: table-row;
+        .card-grid td {
+            padding: 2px 0;
+            font-size: 8.5pt;
         }
-        .info-cell {
-            display: table-cell;
-            padding: 2px 10px 2px 0;
+        .meta-label {
+            font-weight: 600;
+            color: #475569;
+            width: 90px;
         }
-        .label {
-            font-weight: bold;
-            color: #555;
+        .meta-value {
+            color: #0f172a;
         }
-        table {
+
+        /* Items Table */
+        .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
-        th, td {
-            padding: 8px;
+        .items-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 10px 12px;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
-        th {
-            background-color: #f8f8f8;
-            font-weight: bold;
+        .items-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 9pt;
+        }
+        .type-pill {
+            display: inline-block;
+            font-size: 7pt;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            text-transform: uppercase;
+        }
+        .pill-product {
+            background-color: #e0e7ff;
+            color: #4338ca;
+        }
+        .pill-service {
+            background-color: #ede9fe;
+            color: #6d28d9;
         }
         .text-right {
             text-align: right;
         }
-        .footer {
-            margin-top: 30px;
+
+        /* Totals & Notes */
+        .summary-table {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+        .pix-box {
+            background-color: #f0fdf4;
+            border: 1px dashed #86efac;
+            border-radius: 6px;
+            padding: 10px 14px;
+            display: inline-block;
+        }
+        .pix-title {
+            font-size: 8pt;
+            font-weight: 700;
+            color: #166534;
+            text-transform: uppercase;
+        }
+        .pix-key {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9pt;
+            font-weight: 600;
+            color: #14532d;
+            margin-top: 2px;
+        }
+        .total-box {
+            background-color: #0f172a;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 12px 20px;
             text-align: right;
-            border-top: 2px solid #333;
-            padding-top: 10px;
         }
-        .total-row {
-            font-size: 16px;
-            font-weight: bold;
+        .total-label {
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 2px;
         }
-        .seller-info {
-            margin-top: 40px;
+        .total-amount {
+            font-size: 16pt;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Footer */
+        .footer-section {
+            margin-top: 35px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+            font-size: 8pt;
+            color: #64748b;
             text-align: center;
-            font-size: 10px;
-            color: #888;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+        }
+        .footer-section p {
+            margin: 3px 0;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        {% if organization.logo %}
-            <img src="file://{{ organization.logo.path }}" style="height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
-        {% endif %}
-        <h1>{{ organization.name }}</h1>
-        <p>
-            {% if organization.cnpj %}CNPJ: {{ organization.cnpj }} | {% endif %}
-            {% if organization.phone %}Tel: {{ organization.phone }} | {% endif %}
-            {% if organization.email %}Email: {{ organization.email }}{% endif %}
-        </p>
-        {% if organization.address %}
-            <p>{{ organization.address }}</p>
-        {% endif %}
-        <p>Comprovante de Venda #{{ sale.id }}</p>
-        <p>Data: {{ sale.created_at|date:"d/m/Y H:i" }}</p>
-    </div>
+    <!-- Header -->
+    <table class="header-table" cellpadding="0" cellspacing="0">
+        <tr>
+            <td style="vertical-align: top; width: 60%;">
+                {% if organization.logo %}
+                    <img src="file://{{ organization.logo.path }}" style="max-height: 45px; margin-bottom: 8px;">
+                {% endif %}
+                <div class="org-name">{{ organization.name }}</div>
+                <div class="org-meta">
+                    {% if organization.cnpj %}CNPJ: {{ organization.cnpj }}<br>{% endif %}
+                    {% if organization.address %}{{ organization.address }}<br>{% endif %}
+                    {% if organization.phone %}Tel: {{ organization.phone }} {% endif %}
+                    {% if organization.email %}| Email: {{ organization.email }}{% endif %}
+                </div>
+            </td>
+            <td class="receipt-badge-box" style="vertical-align: top; width: 40%;">
+                <div class="receipt-title">Comprovante</div>
+                <div class="receipt-number">Venda #{{ sale.id }}</div>
+                <div class="receipt-date">Emitido em {{ sale.created_at|date:"d/m/Y \à\s H:i" }}</div>
+                <div class="receipt-date">Vendedor: {{ sale.seller.get_full_name|default:sale.seller.email }}</div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="info-section">
-        <h3>Dados do Cliente</h3>
-        <div class="info-grid">
-            <div class="info-row">
-                <div class="info-cell"><span class="label">Nome:</span> {{ sale.customer.name }}</div>
-                <div class="info-cell"><span class="label">Email:</span> {{ sale.customer.email|default:"-" }}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-cell"><span class="label">CPF/CNPJ:</span> {{ sale.customer.document|default:"-" }}</div>
-                <div class="info-cell"><span class="label">Telefone:</span> {{ sale.customer.phone|default:"-" }}</div>
-            </div>
+    <!-- Customer Card -->
+    <div class="customer-card">
+        <div class="section-title">Dados do Cliente</div>
+        <table class="card-grid" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="meta-label">Cliente:</td>
+                <td class="meta-value"><strong>{{ sale.customer.name }}</strong></td>
+                <td class="meta-label">CPF/CNPJ:</td>
+                <td class="meta-value">{{ sale.customer.document|default:"-" }}</td>
+            </tr>
+            <tr>
+                <td class="meta-label">Email:</td>
+                <td class="meta-value">{{ sale.customer.email|default:"-" }}</td>
+                <td class="meta-label">Telefone:</td>
+                <td class="meta-value">{{ sale.customer.phone|default:"-" }}</td>
+            </tr>
             {% if sale.customer.address %}
-            <div class="info-row">
-                <div class="info-cell"><span class="label">Endereço:</span> {{ sale.customer.address }} - {{ sale.customer.city|default:"" }}/{{ sale.customer.state|default:"" }}</div>
-            </div>
+            <tr>
+                <td class="meta-label">Endereço:</td>
+                <td class="meta-value" colspan="3">{{ sale.customer.address }}{% if sale.customer.city %} - {{ sale.customer.city }}{% endif %}{% if sale.customer.state %}/{{ sale.customer.state }}{% endif %}</td>
+            </tr>
             {% endif %}
-        </div>
-    </div>
-
-    <div class="info-section">
-        <h3>Itens da Venda</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Produto/Serviço</th>
-                    <th class="text-right">Qtd</th>
-                    <th class="text-right">Preço Unit.</th>
-                    <th class="text-right">Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in sale.items.all %}
-                <tr>
-                    <td>
-                        {% if item.product %}
-                            {{ item.product.name }} (Produto)
-                        {% elif item.service %}
-                            {{ item.service.name }} (Serviço)
-                        {% else %}
-                            Item Desconhecido
-                        {% endif %}
-                    </td>
-                    <td class="text-right">
-                        {{ item.quantity }}
-                        {% if item.product %}{{ item.product.get_unit_display }}{% endif %}
-                    </td>
-                    <td class="text-right">R$ {{ item.price }}</td>
-                    <td class="text-right">R$ {% widthratio item.quantity 1 item.price %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
         </table>
     </div>
 
-    <div class="footer">
-        
-        {% if organization.pix_key %}
-        <div style="margin-top: 20px; padding: 10px; border: 1px dashed #333; text-align: center;">
-            <strong>Pague via PIX</strong><br>
-            Chave: {{ organization.pix_key }}
-        </div>
-        {% endif %}
+    <!-- Items -->
+    <table class="items-table" cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <th style="width: 50%;">Item / Descrição</th>
+                <th class="text-right" style="width: 15%;">Qtd</th>
+                <th class="text-right" style="width: 17%;">Preço Unit.</th>
+                <th class="text-right" style="width: 18%;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in sale.items.all %}
+            <tr>
+                <td>
+                    <strong>
+                        {% if item.product %}
+                            {{ item.product.name }}
+                        {% elif item.service %}
+                            {{ item.service.name }}
+                        {% else %}
+                            Item não identificado
+                        {% endif %}
+                    </strong>
+                    {% if item.product %}
+                        <span class="type-pill pill-product">Produto</span>
+                    {% elif item.service %}
+                        <span class="type-pill pill-service">Serviço</span>
+                    {% endif %}
+                </td>
+                <td class="text-right">
+                    {{ item.quantity }}
+                    {% if item.product %}<span style="font-size: 7.5pt; color: #64748b;">{{ item.product.get_unit_display }}</span>{% endif %}
+                </td>
+                <td class="text-right">R$ {{ item.price|floatformat:2 }}</td>
+                <td class="text-right"><strong>R$ {{ item.subtotal|floatformat:2 }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
+    <!-- Summary / Totals -->
+    <table class="summary-table" cellpadding="0" cellspacing="0">
+        <tr>
+            <td style="vertical-align: top; width: 55%;">
+                {% if organization.pix_key %}
+                <div class="pix-box">
+                    <div class="pix-title">Pagamento via PIX</div>
+                    <div class="pix-key">{{ organization.pix_key }}</div>
+                </div>
+                {% endif %}
+            </td>
+            <td style="vertical-align: top; width: 45%;">
+                <div class="total-box">
+                    <div class="total-label">Total a Pagar</div>
+                    <div class="total-amount">R$ {{ sale.total|floatformat:2 }}</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Footer Notes -->
+    <div class="footer-section">
         {% if organization.receipt_footer_text %}
-        <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #666;">
-            {{ organization.receipt_footer_text|linebreaksbr }}
-        </div>
+            <p>{{ organization.receipt_footer_text|linebreaksbr }}</p>
         {% endif %}
-        <div class="total-row">
-            Total: R$ {{ sale.total }}
-        </div>
-    </div>
-
-    <div class="seller-info">
-        <p>Vendedor Responsável: {{ sale.seller.get_full_name|default:sale.seller.email }}</p>
-        <p>Obrigado pela preferência!</p>
+        <p>Agradecemos a confiança e preferência!</p>
+        <p style="font-size: 7.5pt; color: #94a3b8; margin-top: 8px;">Vendedor Responsável: {{ sale.seller.get_full_name|default:sale.seller.email }}</p>
     </div>
 </body>
 </html>

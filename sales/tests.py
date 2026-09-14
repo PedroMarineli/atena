@@ -76,3 +76,7 @@ class SaleFlowTests(TestCase):
         
         messages = list(response.context['messages'])
         self.assertTrue(any('Estoque insuficiente' in str(m) for m in messages))
+
+    def test_sale_item_subtotal(self):
+        item = SaleItem.objects.create(sale=self.sale, product=self.product, quantity=3, price=29.99)
+        self.assertEqual(item.subtotal, 3 * 29.99)

@@ -1,109 +1,427 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-BR" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Atena{% endblock %}</title>
+    <title>{% block title %}Atena | Gestão Empresarial{% endblock %}</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans, Inter, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- HTMX, Alpine.js, Tailwind CSS CDN -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'system-ui', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
                     colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            DEFAULT: '#4f46e5',
+                        },
+                        obsidian: {
+                            950: '#070a13',
+                            900: '#0b101d',
+                            850: '#11172a',
+                            800: '#172038',
+                            700: '#1e293b',
+                            600: '#334155',
+                            500: '#475569',
+                            400: '#64748b',
+                            300: '#94a3b8',
+                            200: '#cbd5e1',
+                        },
+                        surface: {
+                            DEFAULT: '#f8fafc',
+                            subtle: '#f1f5f9',
+                            card: '#ffffff',
+                            border: '#e2e8f0',
+                        },
                         primary: {
-                            DEFAULT: '#1e293b', // Slate 800
-                            light: '#334155',   // Slate 700
-                            dark: '#0f172a',    // Slate 900
+                            DEFAULT: '#0f172a',
+                            light: '#1e293b',
+                            dark: '#070a13',
                         },
                         secondary: {
-                            DEFAULT: '#64748b', // Slate 500
-                            light: '#94a3b8',   // Slate 400
+                            DEFAULT: '#64748b',
+                            light: '#94a3b8',
                         },
                         accent: {
-                            DEFAULT: '#2563eb', // Blue 600
-                            hover: '#1d4ed8',   // Blue 700
+                            DEFAULT: '#4f46e5',
+                            hover: '#4338ca',
                         },
-                        surface: '#f1f5f9',     // Slate 100
-                        danger: '#ef4444',      // Red 500
-                        success: '#22c55e',     // Green 500
-                        warning: '#f59e0b',     // Amber 500
+                        success: {
+                            DEFAULT: '#10b981',
+                            light: '#ecfdf5',
+                            text: '#047857',
+                        },
+                        warning: {
+                            DEFAULT: '#f59e0b',
+                            light: '#fffbeb',
+                            text: '#b45309',
+                        },
+                        danger: {
+                            DEFAULT: '#ef4444',
+                            light: '#fef2f2',
+                            text: '#b91c1c',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03)',
+                        'card': '0 1px 3px rgba(0,0,0,0.05), 0 10px 25px -5px rgba(0,0,0,0.04)',
+                        'glow': '0 0 20px -3px rgba(99, 102, 241, 0.35)',
                     }
                 }
             }
         }
     </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(71, 85, 105, 1);
+        }
+    </style>
 </head>
+<body class="bg-surface font-sans text-slate-800 antialiased h-full flex flex-col overflow-hidden" 
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      x-data="{ mobileSidebarOpen: false }">
 
-<body class="bg-surface flex h-screen overflow-hidden" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <!-- Sidebar -->
-    <aside class="w-64 bg-primary text-white flex flex-col shadow-lg">
-        <div class="p-6 bg-primary-dark flex flex-col items-center justify-center">
-            {% if organization.logo %}
-            <img src="{{ organization.logo.url }}" alt="{{ organization.name }}"
-                class="h-16 w-auto mb-2 rounded bg-white p-1">
-            {% endif %}
-            <a href="/" class="text-2xl font-bold tracking-wider">{{ organization.name }}</a>
+    <div class="flex h-full overflow-hidden">
+        <!-- Desktop Sidebar -->
+        <aside class="hidden lg:flex w-64 flex-col bg-obsidian-950 border-r border-obsidian-800 text-slate-300 select-none flex-shrink-0">
+            <!-- Brand Logo & App Header -->
+            <div class="p-5 border-b border-obsidian-800/80 bg-obsidian-900/50 flex items-center justify-between">
+                <a href="/" class="flex items-center gap-3 group">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-700 via-brand-600 to-indigo-400 p-0.5 shadow-glow flex items-center justify-center transition-transform group-hover:scale-105">
+                        <svg class="h-6 w-6 text-white" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 2L4 7V16C4 23.5 9.1 30.1 16 32C22.9 30.1 28 23.5 28 16V7L16 2Z" fill="white" fill-opacity="0.2" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M16 7V25M11 12H21M13 18H19" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-lg font-extrabold tracking-tight text-white group-hover:text-brand-300 transition-colors">ATENA</span>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30">ERP</span>
+                        </div>
+                        <p class="text-[11px] text-obsidian-400 font-medium">Gestão Comercial</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Organization Badge -->
+            <div class="px-4 py-3 mx-3 my-3 rounded-xl bg-obsidian-900 border border-obsidian-800/80 flex items-center gap-3">
+                {% if organization.logo %}
+                    <img src="{{ organization.logo.url }}" alt="{{ organization.name }}" class="h-8 w-8 rounded-lg object-contain bg-white p-0.5 border border-obsidian-700">
+                {% else %}
+                    <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-obsidian-800 to-obsidian-700 border border-obsidian-600 flex items-center justify-center text-xs font-bold text-white uppercase">
+                        {{ organization.name|default:"A"|slice:":2" }}
+                    </div>
+                {% endif %}
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-white truncate">{{ organization.name }}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                        <span class="text-[10px] text-obsidian-400 uppercase tracking-wide">Empresa Ativa</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 px-3 py-2 space-y-6 overflow-y-auto custom-scrollbar font-medium text-xs">
+                <!-- Seção: Visão Geral -->
+                <div>
+                    <p class="px-3 mb-2 text-[10px] font-bold text-obsidian-400 uppercase tracking-wider">Visão Geral</p>
+                    <a href="{% url 'index' %}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if request.path == '/' %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 shadow-sm font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 {% if request.path == '/' %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- Seção: Comercial -->
+                <div>
+                    <p class="px-3 mb-2 text-[10px] font-bold text-obsidian-400 uppercase tracking-wider">Comercial</p>
+                    <div class="space-y-1">
+                        <a href="{% url 'customer_list' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/customers/' in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="users" class="w-4 h-4 {% if '/customers/' in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Clientes</span>
+                        </a>
+                        <a href="{% url 'sale_list' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/sales/' in request.path and '/customers/' not in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="shopping-bag" class="w-4 h-4 {% if '/sales/' in request.path and '/customers/' not in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Vendas</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Seção: Catálogo & Estoque -->
+                <div>
+                    <p class="px-3 mb-2 text-[10px] font-bold text-obsidian-400 uppercase tracking-wider">Catálogo & Estoque</p>
+                    <div class="space-y-1">
+                        <a href="{% url 'item_list' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/products/' in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="package" class="w-4 h-4 {% if '/products/' in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Produtos</span>
+                        </a>
+                        <a href="{% url 'service_list' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/services/' in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="wrench" class="w-4 h-4 {% if '/services/' in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Serviços</span>
+                        </a>
+                        <a href="{% url 'supplier_list' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/suppliers/' in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="truck" class="w-4 h-4 {% if '/suppliers/' in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Fornecedores</span>
+                        </a>
+                        <a href="{% url 'category_list' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/categories/' in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="tags" class="w-4 h-4 {% if '/categories/' in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Categorias</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Seção: Administração & Finanças -->
+                {% if user.role == 'ADMIN' or user.is_superuser %}
+                <div>
+                    <p class="px-3 mb-2 text-[10px] font-bold text-obsidian-400 uppercase tracking-wider">Gestão & Finanças</p>
+                    <div class="space-y-1">
+                        <a href="{% url 'transaction_list' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/finance/' in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="receipt" class="w-4 h-4 {% if '/finance/' in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Financeiro</span>
+                        </a>
+                        <a href="{% url 'user_list' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/users/' in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="shield-check" class="w-4 h-4 {% if '/users/' in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Usuários</span>
+                        </a>
+                        <a href="{% url 'organization_update' %}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {% if '/organization/' in request.path %}bg-brand-600/20 text-brand-300 border-l-2 border-brand-500 font-semibold{% else %}text-slate-300 hover:text-white hover:bg-obsidian-850{% endif %}">
+                            <i data-lucide="settings" class="w-4 h-4 {% if '/organization/' in request.path %}text-brand-400{% else %}text-slate-400{% endif %}"></i>
+                            <span>Configurações</span>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </nav>
+
+            <!-- User Footer Profile Card -->
+            <div class="p-3 border-t border-obsidian-800 bg-obsidian-900/60">
+                <div class="flex items-center justify-between p-2 rounded-xl bg-obsidian-850 border border-obsidian-800">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-600 to-indigo-800 flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0">
+                            {{ user.first_name|default:user.email|slice:":1"|upper }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-semibold text-white truncate">{{ user.get_full_name|default:user.email }}</p>
+                            <p class="text-[10px] text-brand-300 truncate">
+                                {% if user.role == 'ADMIN' or user.is_superuser %}Administrador{% else %}Vendedor{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <form action="{% url 'logout' %}" method="post" class="inline m-0 flex-shrink-0">
+                        {% csrf_token %}
+                        <button type="submit" title="Sair do sistema" 
+                                class="p-1.5 text-obsidian-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Drawer Navigation -->
+        <div x-show="mobileSidebarOpen" 
+             x-cloak
+             class="fixed inset-0 z-50 lg:hidden flex"
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            <!-- Backdrop -->
+            <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm" @click="mobileSidebarOpen = false"></div>
+
+            <!-- Slide-over panel -->
+            <div class="relative flex-1 flex flex-col max-w-xs w-full bg-obsidian-950 border-r border-obsidian-800 z-10"
+                 x-transition:enter="transition ease-in-out duration-300 transform"
+                 x-transition:enter-start="-translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transition ease-in-out duration-300 transform"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="-translate-x-full">
+                
+                <div class="p-4 border-b border-obsidian-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="h-9 w-9 rounded-xl bg-brand-600 flex items-center justify-center text-white">
+                            <svg class="h-5 w-5" viewBox="0 0 32 32" fill="none">
+                                <path d="M16 2L4 7V16C4 23.5 9.1 30.1 16 32C22.9 30.1 28 23.5 28 16V7L16 2Z" fill="white" fill-opacity="0.2" stroke="white" stroke-width="2"/>
+                                <path d="M16 7V25M11 12H21M13 18H19" stroke="white" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <span class="text-base font-extrabold text-white">ATENA ERP</span>
+                    </div>
+                    <button @click="mobileSidebarOpen = false" class="p-2 text-slate-400 hover:text-white rounded-lg">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <nav class="flex-1 px-3 py-4 space-y-4 overflow-y-auto text-sm text-slate-300">
+                    <a href="{% url 'index' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </a>
+                    <a href="{% url 'customer_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                        <i data-lucide="users" class="w-4 h-4"></i> Clientes
+                    </a>
+                    <a href="{% url 'sale_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i> Vendas
+                    </a>
+                    <a href="{% url 'item_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                        <i data-lucide="package" class="w-4 h-4"></i> Produtos
+                    </a>
+                    <a href="{% url 'service_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                        <i data-lucide="wrench" class="w-4 h-4"></i> Serviços
+                    </a>
+                    <a href="{% url 'supplier_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                        <i data-lucide="truck" class="w-4 h-4"></i> Fornecedores
+                    </a>
+                    <a href="{% url 'category_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                        <i data-lucide="tags" class="w-4 h-4"></i> Categorias
+                    </a>
+                    {% if user.role == 'ADMIN' or user.is_superuser %}
+                    <div class="pt-2 border-t border-obsidian-800">
+                        <a href="{% url 'transaction_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                            <i data-lucide="receipt" class="w-4 h-4"></i> Financeiro
+                        </a>
+                        <a href="{% url 'user_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i> Usuários
+                        </a>
+                        <a href="{% url 'organization_update' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-obsidian-850">
+                            <i data-lucide="settings" class="w-4 h-4"></i> Configurações
+                        </a>
+                    </div>
+                    {% endif %}
+                </nav>
+
+                <div class="p-4 border-t border-obsidian-800">
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold hover:bg-rose-500/20 transition">
+                            <i data-lucide="log-out" class="w-4 h-4"></i> Sair da Conta
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            <a href="{% url 'customer_list' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Clientes</a>
-            <a href="{% url 'supplier_list' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Fornecedores</a>
-            <a href="{% url 'category_list' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Categorias</a>
-            <a href="{% url 'item_list' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Produtos</a>
-            <a href="{% url 'service_list' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Serviços</a>
-            <a href="{% url 'sale_list' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Vendas</a>
+        <!-- Main Viewport Area -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
+            <!-- Top Navbar -->
+            <header class="bg-white border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between flex-shrink-0 z-10 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <!-- Mobile trigger button -->
+                    <button @click="mobileSidebarOpen = true" 
+                            class="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    
+                    <!-- Breadcrumbs / Page Title Context -->
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <span class="font-bold tracking-tight text-slate-800">Atena</span>
+                        <span class="text-slate-300">/</span>
+                        <span class="text-brand-600 font-semibold">{% block breadcrumb %}Painel{% endblock %}</span>
+                    </div>
+                </div>
 
-            {% if user.role == 'ADMIN' or user.is_superuser %}
-            <div class="pt-4 pb-2">
-                <p class="px-4 text-xs font-semibold text-secondary uppercase tracking-wider">Administração</p>
-            </div>
-            <a href="{% url 'transaction_list' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Financeiro</a>
-            <a href="{% url 'user_list' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Usuários</a>
-            <a href="{% url 'organization_update' %}"
-                class="block px-4 py-2 rounded transition-colors hover:bg-primary-light">Configurações</a>
-            {% endif %}
-        </nav>
+                <!-- Right Utility Bar -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Live Status Pill -->
+                    <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-[11px] font-medium text-emerald-700">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span>Sistema Online</span>
+                    </div>
 
-        <div class="p-4 bg-primary-dark">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-sm truncate mr-2">{{ user.get_full_name }}</span>
-                <form action="{% url 'logout' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <button type="submit"
-                        class="text-danger hover:text-red-300 text-sm font-medium transition-colors">Sair</button>
-                </form>
-            </div>
-            <div class="text-xs text-secondary text-right border-t border-slate-700 pt-2">
-                {{ system_version }}
-            </div>
+                    <!-- Quick Sale Shortcut -->
+                    <a href="{% url 'sale_create' %}" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm shadow-brand-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Nova Venda</span>
+                    </a>
+
+                    <!-- User Pill -->
+                    <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                        <div class="h-7 w-7 rounded-full bg-brand-100 text-brand-700 font-bold text-xs flex items-center justify-center border border-brand-200">
+                            {{ user.first_name|default:user.email|slice:":1"|upper }}
+                        </div>
+                        <span class="hidden md:inline text-xs font-medium text-slate-700">{{ user.first_name|default:user.email }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Scrollable Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 custom-scrollbar">
+                <!-- System Alerts / Flash Messages -->
+                <div id="messages" class="mb-6">
+                    {% include 'partials/messages.html' %}
+                </div>
+
+                <!-- Page Content -->
+                {% block content %}{% endblock %}
+            </main>
         </div>
-    </aside>
+    </div>
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto bg-surface p-8">
-        <div id="messages" class="mb-4">
-            {% if messages %}
-            {% for message in messages %}
-            <div
-                class="p-4 mb-2 rounded-md border {% if message.tags == 'error' %}bg-red-50 text-red-700 border-red-200{% elif message.tags == 'success' %}bg-green-50 text-green-700 border-green-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-700 border-yellow-200{% else %}bg-blue-50 text-blue-700 border-blue-200{% endif %}">
-                {{ message }}
-            </div>
-            {% endfor %}
-            {% endif %}
-        </div>
-        {% block content %}{% endblock %}
-    </main>
+    <!-- Initialize and keep Lucide Icons in sync with HTMX and DOM changes -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) { lucide.createIcons(); }
+        });
+        document.addEventListener('htmx:afterSwap', () => {
+            if (window.lucide) { lucide.createIcons(); }
+        });
+        document.addEventListener('htmx:afterSettle', () => {
+            if (window.lucide) { lucide.createIcons(); }
+        });
+    </script>
 </body>
-
 </html>

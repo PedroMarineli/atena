@@ -2,30 +2,39 @@
       hx-target="#modal-content" 
       hx-swap="innerHTML">
     
-    <div class="mb-4">
-        <h3 class="text-lg font-bold">{{ modal_title }}</h3>
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-4 mb-5 border-b border-surface-border">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
+                <i data-lucide="user-cog" class="w-4 h-4"></i>
+            </div>
+            <h3 class="text-lg font-semibold font-display text-slate-900">{{ modal_title }}</h3>
+        </div>
+        <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
     </div>
     
     {% csrf_token %}
     
-    <div class="grid grid-cols-1 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {% for field in form %}
-        <div>
-            <label class="block text-sm font-medium text-primary-light">{{ field.label }}</label>
+        <div class="{% if field.name == 'email' or field.name == 'username' %}sm:col-span-2{% endif %}">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">{{ field.label }}</label>
             {{ field }}
             {% if field.help_text %}
-            <p class="text-secondary text-xs">{{ field.help_text }}</p>
+            <p class="text-slate-400 text-xs mt-1">{{ field.help_text }}</p>
             {% endif %}
             {% if field.errors %}
                 {% for error in field.errors %}
-                <p class="text-danger text-xs italic mt-1">{{ error }}</p>
+                <p class="text-red-500 text-xs mt-1 font-medium">{{ error }}</p>
                 {% endfor %}
             {% endif %}
         </div>
         {% endfor %}
         
         {% if form.non_field_errors %}
-        <div class="bg-red-50 text-red-700 p-2 rounded text-sm">
+        <div class="sm:col-span-2 bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs space-y-1">
             {% for error in form.non_field_errors %}
                 <p>{{ error }}</p>
             {% endfor %}
@@ -33,12 +42,13 @@
         {% endif %}
     </div>
 
-    <div class="mt-4 flex justify-end">
-        <button type="button" @click="open = false" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded mr-2 transition-colors">
+    <div class="mt-6 pt-4 border-t border-surface-border flex items-center justify-end gap-3">
+        <button type="button" @click="open = false" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
             Cancelar
         </button>
-        <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-4 rounded transition-colors">
-            Salvar
+        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 active:bg-brand-800 rounded-lg shadow-sm transition-all duration-200 cursor-pointer">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Salvar Usuário</span>
         </button>
     </div>
 </form>

@@ -1,22 +1,28 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-lg mx-auto bg-white shadow-md rounded-xl border border-slate-200 p-6">
-    <h3 class="text-lg font-bold mb-4">Confirmar Exclusão</h3>
-    <p>Tem certeza que deseja excluir o usuário <strong>{{ user.email }}</strong>?</p>
+<div class="max-w-md mx-auto my-12">
+    <div class="bg-surface-card border border-surface-border rounded-2xl shadow-lg p-6 sm:p-8 text-center">
+        <!-- Warning Icon -->
+        <div class="w-14 h-14 rounded-full bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center mx-auto mb-5">
+            <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+        </div>
 
-    <form method="post">
-        {% csrf_token %}
-        <div class="mt-4 flex justify-end">
-            <a href="{% url 'user_list' %}"
-                class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded mr-2 transition-colors">
+        <h3 class="text-xl font-bold font-display text-slate-900 mb-2">Excluir Usuário</h3>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">
+            Você está prestes a remover o acesso de <strong class="text-slate-800 font-semibold">{{ user.email }}</strong>. Esta ação revoga todas as permissões no sistema imediatamente.
+        </p>
+
+        <form method="post" class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            {% csrf_token %}
+            <a href="{% url 'user_list' %}" class="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors text-center">
                 Cancelar
             </a>
-            <button type="submit"
-                class="bg-danger hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors">
-                Excluir
+            <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 rounded-lg shadow-sm transition-all duration-200 cursor-pointer">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span>Confirmar Exclusão</span>
             </button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 {% endblock %}

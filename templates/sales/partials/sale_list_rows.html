@@ -1,22 +1,75 @@
 {% for sale in sales %}
-<tr class="hover:bg-slate-50 transition-colors">
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">#{{ sale.id }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ sale.customer.name }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ sale.seller.email }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ sale.created_at|date:"d/m/Y H:i" }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {{ sale.total }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ sale.get_status_display }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <a href="{% url 'sale_detail' sale.pk %}"
-            class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">Detalhes</a>
-        <button hx-get="{% url 'sale_update' sale.pk %}" hx-target="#modal-content" @click="open = true"
-            class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
-            Editar
+<tr class="hover:bg-slate-50/70 transition-colors">
+    <td class="py-3 px-4 sm:px-6 font-mono font-bold text-slate-800">
+        #{{ sale.id }}
+    </td>
+    <td class="py-3 px-4 sm:px-6">
+        <div class="flex items-center gap-2.5">
+            <div class="h-7 w-7 rounded-lg bg-indigo-50 text-indigo-700 font-bold text-xs flex items-center justify-center border border-indigo-100 flex-shrink-0">
+                {{ sale.customer.name|slice:":1"|upper }}
+            </div>
+            <span class="font-semibold text-slate-800">{{ sale.customer.name }}</span>
+        </div>
+    </td>
+    <td class="py-3 px-4 sm:px-6 text-slate-600">
+        {{ sale.seller.get_full_name|default:sale.seller.email }}
+    </td>
+    <td class="py-3 px-4 sm:px-6 text-slate-500 font-mono text-xs">
+        {{ sale.created_at|date:"d/m/Y H:i" }}
+    </td>
+    <td class="py-3 px-4 sm:px-6 font-mono font-bold text-slate-900">
+        R$ {{ sale.total|floatformat:2 }}
+    </td>
+    <td class="py-3 px-4 sm:px-6">
+        {% if sale.status == 'COMPLETED' %}
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                Finalizada
+            </span>
+        {% elif sale.status == 'PENDING' %}
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60">
+                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                Pendente
+            </span>
+        {% else %}
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/60">
+                <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+                Cancelada
+            </span>
+        {% endif %}
+    </td>
+    <td class="py-3 px-4 sm:px-6 text-right space-x-1">
+        <a href="{% url 'sale_detail' sale.pk %}" 
+           title="Ver Detalhes"
+           class="inline-flex items-center justify-center p-1.5 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+        </a>
+        <button hx-get="{% url 'sale_update' sale.pk %}" 
+                hx-target="#modal-content" 
+                @click="open = true" 
+                title="Editar Venda"
+                class="inline-flex items-center justify-center p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
         </button>
-        <button hx-delete="{% url 'sale_delete' sale.pk %}" hx-confirm="Tem certeza que deseja excluir esta venda?"
-            hx-target="#sale-table-body" class="text-danger hover:text-red-700 font-medium transition-colors">
-            Excluir
+        <button hx-delete="{% url 'sale_delete' sale.pk %}" 
+                hx-confirm="Tem certeza que deseja excluir esta venda?" 
+                hx-target="#sale-table-body" 
+                title="Excluir Venda"
+                class="inline-flex items-center justify-center p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
         </button>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class="py-12 text-center text-slate-400">
+        <div class="flex flex-col items-center justify-center gap-2">
+            <div class="p-3 rounded-full bg-slate-100 text-slate-400">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+            </div>
+            <p class="font-medium text-slate-600 text-sm">Nenhuma venda registrada até o momento</p>
+            <p class="text-xs text-slate-400">Clique em "Nova Venda" para criar o primeiro pedido.</p>
+        </div>
     </td>
 </tr>
 {% endfor %}

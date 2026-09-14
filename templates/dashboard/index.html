@@ -1,179 +1,427 @@
 {% extends 'base.html' %}
 
+{% block breadcrumb %}Dashboard Executivo{% endblock %}
+
 {% block content %}
-    <div class="mb-6">
-        <h2 class="text-xl text-gray-500">{{ organization.name }}</h2>
-        <h1 class="text-3xl font-bold">Olá, {{ user.get_full_name }}</h1>
+<div class="space-y-8">
+    <!-- Welcome Header & Quick Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-semibold uppercase tracking-wider text-brand-600 bg-brand-50 border border-brand-200 px-2.5 py-0.5 rounded-full">
+                    {{ organization.name }}
+                </span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+                Olá, {{ user.first_name|default:user.email }} 👋
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Aqui está o panorama em tempo real de vendas, faturamento e inventário.
+            </p>
+        </div>
+        
+        <div class="flex items-center gap-2.5">
+            <a href="{% url 'sale_create' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm shadow-brand-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Nova Venda</span>
+            </a>
+            <a href="{% url 'item_create' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold shadow-sm transition-all hover:border-slate-300">
+                <i data-lucide="package-plus" class="w-4 h-4 text-slate-500"></i>
+                <span>Novo Produto</span>
+            </a>
+        </div>
     </div>
     
-    <!-- KPIs Section -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-sm font-medium text-gray-500 mb-1">Vendas Hoje</h3>
-            <p class="text-2xl font-bold text-accent">R$ {{ sales_today_amount|floatformat:2 }}</p>
+    <!-- Bento-Grid KPIs Section -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <!-- Vendas Hoje -->
+        <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-card transition-all relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Vendas Hoje</span>
+                <div class="p-2 rounded-xl bg-brand-50 text-brand-600 border border-brand-100/80">
+                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono tracking-tight">
+                R$ {{ sales_today_amount|floatformat:2 }}
+            </p>
+            <div class="mt-3 flex items-center gap-2 text-xs">
+                <span class="inline-flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i> Faturado hoje
+                </span>
+            </div>
         </div>
         
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-sm font-medium text-gray-500 mb-1">Ticket Médio (Hoje)</h3>
-            <p class="text-2xl font-bold text-gray-800">R$ {{ average_ticket|floatformat:2 }}</p>
+        <!-- Ticket Médio -->
+        <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-card transition-all relative overflow-hidden group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ticket Médio</span>
+                <div class="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100/80">
+                    <i data-lucide="calculator" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono tracking-tight">
+                R$ {{ average_ticket|floatformat:2 }}
+            </p>
+            <div class="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                <span>Média por pedido hoje</span>
+            </div>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-sm font-medium text-gray-500 mb-1">Pedidos Pendentes</h3>
-            <p class="text-2xl font-bold text-warning">{{ pending_orders_count }}</p>
-        </div>
+        <!-- Pedidos Pendentes -->
+        <a href="{% url 'sale_list' %}" class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-card transition-all relative overflow-hidden group block">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pedidos Pendentes</span>
+                <div class="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100/80">
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-amber-600 font-mono tracking-tight">
+                {{ pending_orders_count }}
+            </p>
+            <div class="mt-3 flex items-center gap-1.5 text-xs text-amber-700 font-medium">
+                <span>Aguardando finalização</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+        </a>
 
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-sm font-medium text-gray-500 mb-1">Estoque Baixo</h3>
-            <p class="text-2xl font-bold text-danger">{{ low_stock_count }}</p>
-        </div>
+        <!-- Estoque Baixo -->
+        <a href="{% url 'item_list' %}" class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-card transition-all relative overflow-hidden group block">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Estoque Baixo</span>
+                <div class="p-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-100/80">
+                    <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-rose-600 font-mono tracking-tight">
+                {{ low_stock_count }}
+            </p>
+            <div class="mt-3 flex items-center gap-1.5 text-xs text-rose-700 font-medium">
+                <span>Itens abaixo do mínimo</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+        </a>
         
-        {% if user.role == 'ADMIN' %}
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-sm font-medium text-gray-500 mb-1">Fluxo de Caixa</h3>
-            <p class="text-2xl font-bold {% if cash_flow >= 0 %}text-success{% else %}text-danger{% endif %}">R$ {{ cash_flow|floatformat:2 }}</p>
+        {% if user.role == 'ADMIN' or user.is_superuser %}
+        <!-- Fluxo de Caixa -->
+        <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-card transition-all relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Fluxo de Caixa Líquido</span>
+                <div class="p-2 rounded-xl bg-slate-100 text-slate-700">
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold font-mono tracking-tight {% if cash_flow >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                R$ {{ cash_flow|floatformat:2 }}
+            </p>
+            <div class="mt-3 flex items-center gap-1 text-xs font-medium {% if cash_flow >= 0 %}text-emerald-700{% else %}text-rose-700{% endif %}">
+                {% if cash_flow >= 0 %}
+                    <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Saldo positivo acumulado
+                {% else %}
+                    <i data-lucide="trending-down" class="w-3.5 h-3.5"></i> Saldo negativo
+                {% endif %}
+            </div>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-sm font-medium text-gray-500 mb-1">Contas a Receber (7d)</h3>
-            <p class="text-2xl font-bold text-success">R$ {{ receivables|floatformat:2 }}</p>
+        <!-- Contas a Receber -->
+        <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-card transition-all relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">A Receber (7 dias)</span>
+                <div class="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+                    <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-mono tracking-tight">
+                R$ {{ receivables|floatformat:2 }}
+            </p>
+            <div class="mt-3 text-xs text-slate-500">
+                Previsão de entradas imediatas
+            </div>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-sm font-medium text-gray-500 mb-1">Contas a Pagar (7d)</h3>
-            <p class="text-2xl font-bold text-danger">R$ {{ payables|floatformat:2 }}</p>
+        <!-- Contas a Pagar -->
+        <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-card transition-all relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">A Pagar (7 dias)</span>
+                <div class="p-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
+                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-rose-600 font-mono tracking-tight">
+                R$ {{ payables|floatformat:2 }}
+            </p>
+            <div class="mt-3 text-xs text-slate-500">
+                Contas e compromissos futuros
+            </div>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-sm font-medium text-gray-500 mb-1">Valor em Estoque</h3>
-            <p class="text-2xl font-bold text-blue-600">R$ {{ stock_value|floatformat:2 }}</p>
+        <!-- Valor em Estoque -->
+        <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-card transition-all relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Valor em Estoque</span>
+                <div class="p-2 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <p class="text-2xl sm:text-3xl font-extrabold text-sky-600 font-mono tracking-tight">
+                R$ {{ stock_value|floatformat:2 }}
+            </p>
+            <div class="mt-3 text-xs text-slate-500">
+                Patrimônio físico inventariado
+            </div>
         </div>
         {% endif %}
     </div>
 
     <!-- Charts Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" x-data="dashboardCharts()" x-init="initCharts()">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" x-data="dashboardCharts()" x-init="initCharts()">
         <!-- Sales Chart -->
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-4">Vendas (Últimos 30 Dias)</h3>
-            <div class="relative h-64">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-soft">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Evolução de Vendas</h3>
+                    <p class="text-xs text-slate-500">Faturamento acumulado nos últimos 30 dias</p>
+                </div>
+                <div class="p-2 rounded-xl bg-brand-50 text-brand-600">
+                    <i data-lucide="line-chart" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="relative h-64 sm:h-72">
                 <canvas id="salesChart"></canvas>
             </div>
         </div>
 
         <!-- Cash Flow Chart -->
-        {% if user.role == 'ADMIN' %}
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-4">Fluxo de Caixa Mensal</h3>
-            <div class="relative h-64">
+        {% if user.role == 'ADMIN' or user.is_superuser %}
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-soft">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Fluxo de Caixa Mensal</h3>
+                    <p class="text-xs text-slate-500">Comparativo de Receitas e Despesas</p>
+                </div>
+                <div class="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="relative h-64 sm:h-72">
                 <canvas id="cashFlowChart"></canvas>
             </div>
         </div>
         {% endif %}
 
         <!-- Top Products Chart -->
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-4">Top 5 Produtos</h3>
-            <div class="relative h-64">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-soft">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Top 5 Produtos Mais Vendidos</h3>
+                    <p class="text-xs text-slate-500">Volume total de unidades comercializadas</p>
+                </div>
+                <div class="p-2 rounded-xl bg-amber-50 text-amber-600">
+                    <i data-lucide="award" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="relative h-64 sm:h-72">
                 <canvas id="topProductsChart"></canvas>
             </div>
         </div>
 
         <!-- Sales Mix Chart -->
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-4">Mix de Vendas (Qtd)</h3>
-            <div class="relative h-64">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-soft">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Mix de Vendas</h3>
+                    <p class="text-xs text-slate-500">Proporção entre Produtos e Serviços</p>
+                </div>
+                <div class="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+                    <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="relative h-64 sm:h-72 flex items-center justify-center">
                 <canvas id="mixChart"></canvas>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Chart.js Integration -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        function dashboardCharts() {
-            return {
-                initCharts() {
-                    fetch('{% url "dashboard_charts_data" %}')
-                        .then(response => response.json())
-                        .then(data => {
-                            this.renderSalesChart(data.sales_chart);
-                            {% if user.role == 'ADMIN' %}
-                            this.renderCashFlowChart(data.cash_flow_chart);
-                            {% endif %}
-                            this.renderTopProductsChart(data.top_products_chart);
-                            this.renderMixChart(data.mix_chart);
-                        });
-                },
-                renderSalesChart(data) {
-                    new Chart(document.getElementById('salesChart'), {
-                        type: 'line',
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: 'Vendas (R$)',
-                                data: data.data,
-                                borderColor: '#4F46E5',
-                                tension: 0.1,
-                                fill: false
-                            }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false }
+<!-- Chart.js Integration with Modern Visual Polish -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function dashboardCharts() {
+        return {
+            initCharts() {
+                // Configure global Chart.js defaults
+                Chart.defaults.font.family = "'Plus Jakarta Sans', 'Inter', sans-serif";
+                Chart.defaults.color = '#64748b';
+                Chart.defaults.plugins.tooltip.backgroundColor = '#0f172a';
+                Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+                Chart.defaults.plugins.tooltip.bodyColor = '#e2e8f0';
+                Chart.defaults.plugins.tooltip.cornerRadius = 8;
+                Chart.defaults.plugins.tooltip.padding = 10;
+
+                fetch('{% url "dashboard_charts_data" %}')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.renderSalesChart(data.sales_chart);
+                        {% if user.role == 'ADMIN' or user.is_superuser %}
+                        this.renderCashFlowChart(data.cash_flow_chart);
+                        {% endif %}
+                        this.renderTopProductsChart(data.top_products_chart);
+                        this.renderMixChart(data.mix_chart);
+                        if (window.lucide) { lucide.createIcons(); }
                     });
-                },
-                renderCashFlowChart(data) {
-                    new Chart(document.getElementById('cashFlowChart'), {
-                        type: 'bar',
-                        data: {
-                            labels: data.labels,
-                            datasets: [
-                                {
-                                    label: 'Receitas',
-                                    data: data.income,
-                                    backgroundColor: '#10B981'
-                                },
-                                {
-                                    label: 'Despesas',
-                                    data: data.expense,
-                                    backgroundColor: '#EF4444'
+            },
+            renderSalesChart(data) {
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+                gradient.addColorStop(0, 'rgba(99, 102, 241, 0.28)');
+                gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: data.data,
+                            borderColor: '#6366f1',
+                            backgroundColor: gradient,
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#6366f1',
+                            pointBorderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            tension: 0.35,
+                            fill: true
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    callback: function(value) { return 'R$ ' + value; }
                                 }
-                            ]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false }
-                    });
-                },
-                renderTopProductsChart(data) {
-                    new Chart(document.getElementById('topProductsChart'), {
-                        type: 'bar',
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: 'Quantidade Vendida',
-                                data: data.data,
-                                backgroundColor: '#F59E0B'
-                            }]
-                        },
-                        options: { 
-                            indexAxis: 'y',
-                            responsive: true, 
-                            maintainAspectRatio: false 
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
                         }
-                    });
-                },
-                renderMixChart(data) {
-                    new Chart(document.getElementById('mixChart'), {
-                        type: 'doughnut',
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                data: data.data,
-                                backgroundColor: ['#3B82F6', '#8B5CF6']
-                            }]
+                    }
+                });
+            },
+            renderCashFlowChart(data) {
+                const el = document.getElementById('cashFlowChart');
+                if (!el) return;
+                new Chart(el, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'Receitas (Entradas)',
+                                data: data.income,
+                                backgroundColor: '#10b981',
+                                borderRadius: 6,
+                                maxBarThickness: 28,
+                            },
+                            {
+                                label: 'Despesas (Saídas)',
+                                data: data.expense,
+                                backgroundColor: '#f43f5e',
+                                borderRadius: 6,
+                                maxBarThickness: 28,
+                            }
+                        ]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { boxWidth: 12, borderRadius: 4, useBorderRadius: true }
+                            }
                         },
-                        options: { responsive: true, maintainAspectRatio: false }
-                    });
-                }
+                        scales: {
+                            y: {
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    callback: function(value) { return 'R$ ' + value; }
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            },
+            renderTopProductsChart(data) {
+                new Chart(document.getElementById('topProductsChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Qtd. Vendida',
+                            data: data.data,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6,
+                            maxBarThickness: 20,
+                        }]
+                    },
+                    options: { 
+                        indexAxis: 'y',
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: '#f1f5f9' },
+                                ticks: { stepSize: 1 }
+                            },
+                            y: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            },
+            renderMixChart(data) {
+                new Chart(document.getElementById('mixChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.data,
+                            backgroundColor: ['#6366f1', '#06b6d4', '#10b981'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, borderRadius: 4, useBorderRadius: true, padding: 16 }
+                            }
+                        }
+                    }
+                });
             }
         }
-    </script>
+    }
+</script>
 {% endblock %}
+

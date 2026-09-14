@@ -1,50 +1,176 @@
 {% extends 'base.html' %}
 
+{% block title %}Configurações da Organização - Atena{% endblock %}
+
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white shadow-md rounded-xl border border-slate-200 p-6">
-    <h2 class="text-2xl font-bold mb-6 text-gray-800">Dados da Organização</h2>
-
-    <form method="post" enctype="multipart/form-data" class="space-y-6">
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-        <div class="bg-red-50 text-red-700 p-4 rounded mb-4">
-            {{ form.non_field_errors }}
+<div class="max-w-4xl mx-auto mb-12">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-2">
+            <h1 class="text-2xl font-bold font-display text-slate-900 tracking-tight">Dados da Organização</h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-100">
+                Configurações da Empresa
+            </span>
         </div>
-        {% endif %}
+        <p class="text-sm text-slate-500 mt-1">Gerencie as informações corporativas, logotipo oficial, chave PIX e rodapé dos comprovantes de venda.</p>
+    </div>
 
-        {% for field in form %}
-        <div>
-            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                {{ field.label }}
-            </label>
-            {{ field }}
-            {% if field.help_text %}
-            <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+    <!-- Main Settings Card -->
+    <div class="bg-surface-card border border-surface-border rounded-2xl shadow-xs overflow-hidden">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="m-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+                {{ form.non_field_errors }}
+            </div>
             {% endif %}
-            {% if field.errors %}
-            <ul class="mt-1 text-sm text-red-600">
-                {% for error in field.errors %}
-                <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-        </div>
-        {% endfor %}
 
-        {% if organization.logo %}
-        <div class="mt-4">
-            <p class="text-sm font-medium text-gray-700 mb-2">Logo Atual:</p>
-            <img src="{{ organization.logo.url }}" alt="Logo Atual" class="h-20 w-auto rounded border p-1">
-        </div>
-        {% endif %}
+            <!-- Section 1: Identidade & Marca -->
+            <div class="p-6 sm:p-8 border-b border-surface-border">
+                <div class="flex items-center gap-2.5 mb-5">
+                    <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
+                        <i data-lucide="building" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-semibold font-display text-slate-900">Identidade & Logotipo</h2>
+                        <p class="text-xs text-slate-500">Nome fantasia e marca oficial que aparecerá no cabeçalho do sistema e nos recibos.</p>
+                    </div>
+                </div>
 
-        <div class="flex justify-end pt-4">
-            <button type="submit"
-                class="bg-accent hover:bg-accent-hover text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline">
-                Salvar Configurações
-            </button>
-        </div>
-    </form>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="sm:col-span-2">
+                        <label for="{{ form.name.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            {{ form.name.label }}
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <p class="text-red-500 text-xs mt-1 font-medium">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="{{ form.logo.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            {{ form.logo.label }}
+                        </label>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 mt-2">
+                            {% if organization.logo %}
+                            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center shrink-0">
+                                <img src="{{ organization.logo.url }}" alt="Logo da Empresa" class="h-14 w-auto max-w-[140px] object-contain">
+                            </div>
+                            {% endif %}
+                            <div class="flex-1 w-full">
+                                {{ form.logo }}
+                                <p class="text-xs text-slate-400 mt-1.5">Formatos suportados: PNG, JPG ou WEBP. Resolução recomendada: 400x120px.</p>
+                                {% if form.logo.errors %}
+                                <p class="text-red-500 text-xs mt-1 font-medium">{{ form.logo.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Informações Fiscais & Contato -->
+            <div class="p-6 sm:p-8 border-b border-surface-border">
+                <div class="flex items-center gap-2.5 mb-5">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                        <i data-lucide="file-badge" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-semibold font-display text-slate-900">Fiscal & Localização</h2>
+                        <p class="text-xs text-slate-500">Documentação e canais de contato com os clientes.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div>
+                        <label for="{{ form.cnpj.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            {{ form.cnpj.label }}
+                        </label>
+                        {{ form.cnpj }}
+                        {% if form.cnpj.errors %}
+                        <p class="text-red-500 text-xs mt-1 font-medium">{{ form.cnpj.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.phone.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            {{ form.phone.label }}
+                        </label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                        <p class="text-red-500 text-xs mt-1 font-medium">{{ form.phone.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            {{ form.email.label }}
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <p class="text-red-500 text-xs mt-1 font-medium">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <label for="{{ form.address.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            {{ form.address.label }}
+                        </label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                        <p class="text-red-500 text-xs mt-1 font-medium">{{ form.address.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Pagamentos & Emissão de Recibos -->
+            <div class="p-6 sm:p-8">
+                <div class="flex items-center gap-2.5 mb-5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="qr-code" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-semibold font-display text-slate-900">Pagamento PIX & Recibos</h2>
+                        <p class="text-xs text-slate-500">Dados exibidos ao final do comprovante de venda para transferência direta.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label for="{{ form.pix_key.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            {{ form.pix_key.label }}
+                        </label>
+                        {{ form.pix_key }}
+                        <p class="text-xs text-slate-400 mt-1">Exibido em destaque nos comprovantes de venda gerados em PDF.</p>
+                        {% if form.pix_key.errors %}
+                        <p class="text-red-500 text-xs mt-1 font-medium">{{ form.pix_key.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.receipt_footer_text.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            {{ form.receipt_footer_text.label }}
+                        </label>
+                        {{ form.receipt_footer_text }}
+                        <p class="text-xs text-slate-400 mt-1">Mensagem de encerramento, termos de garantia ou observações personalizadas.</p>
+                        {% if form.receipt_footer_text.errors %}
+                        <p class="text-red-500 text-xs mt-1 font-medium">{{ form.receipt_footer_text.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action Bar -->
+            <div class="p-6 bg-slate-50/75 border-t border-surface-border flex items-center justify-end">
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 active:bg-brand-800 rounded-lg shadow-sm hover:shadow transition-all duration-200 cursor-pointer">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Salvar Configurações</span>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -39,6 +39,10 @@ class SaleItem(models.Model):
     quantity = models.IntegerField(default=1, verbose_name="Quantidade")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Preço") # Price at the moment of sale
     
+    @property
+    def subtotal(self):
+        return self.quantity * self.price
+    
     def clean(self):
         if self.product and self.service:
             raise ValidationError("A SaleItem cannot be both a Product and a Service.")

@@ -1,18 +1,70 @@
 {% for customer in customers %}
-<tr class="hover:bg-slate-50 transition-colors">
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ customer.name }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ customer.email }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ customer.phone }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button hx-get="{% url 'customer_update' customer.pk %}" hx-target="#modal-content" @click="open = true"
-            class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
-            Editar
-        </button>
-        <button hx-delete="{% url 'customer_delete' customer.pk %}"
-            hx-confirm="Tem certeza que deseja excluir este cliente?" hx-target="#customer-table-body"
-            class="text-danger hover:text-red-700 font-medium transition-colors">
-            Excluir
-        </button>
+<tr class="hover:bg-slate-50/75 transition-colors group">
+    <td class="py-4 px-6">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-100 to-indigo-100 border border-brand-200 text-brand-700 flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                {{ customer.name|slice:":2"|upper }}
+            </div>
+            <div>
+                <span class="font-medium text-slate-900 block">{{ customer.name }}</span>
+                {% if customer.city or customer.state %}
+                <span class="text-xs text-slate-400 block">{{ customer.city }}{% if customer.city and customer.state %} - {% endif %}{{ customer.state }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </td>
+    <td class="py-4 px-6">
+        <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5 text-xs text-slate-600">
+                <i data-lucide="mail" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>{{ customer.email|default:"Sem email" }}</span>
+            </div>
+            {% if customer.phone %}
+            <div class="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                <i data-lucide="phone" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>{{ customer.phone }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </td>
+    <td class="py-4 px-6">
+        {% if customer.document %}
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200">
+            {{ customer.document }}
+        </span>
+        {% else %}
+        <span class="text-xs text-slate-400">Não informado</span>
+        {% endif %}
+    </td>
+    <td class="py-4 px-6 text-right">
+        <div class="flex items-center justify-end gap-1.5">
+            <button hx-get="{% url 'customer_update' customer.pk %}" 
+                    hx-target="#modal-content" 
+                    @click="open = true"
+                    title="Editar Cliente"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+            </button>
+            <button hx-delete="{% url 'customer_delete' customer.pk %}" 
+                    hx-confirm="Tem certeza que deseja excluir este cliente?" 
+                    hx-target="#customer-table-body" 
+                    title="Excluir Cliente"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4" class="py-12 px-6 text-center text-slate-500">
+        <div class="flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <p class="font-medium text-slate-700">Nenhum cliente cadastrado</p>
+            <p class="text-xs text-slate-400 mt-1">Cadastre seus clientes para associá-los a pedidos e vendas.</p>
+        </div>
     </td>
 </tr>
 {% endfor %}

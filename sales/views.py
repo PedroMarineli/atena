@@ -203,7 +203,6 @@ def sale_add_item(request, pk):
                 messages_html = render_to_string('partials/messages.html', {}, request=request)
                 return HttpResponse(rows_html + messages_html)
     return redirect('sale_detail', pk=pk)
-    return redirect('sale_detail', pk=pk)
 
 @require_http_methods(["DELETE", "POST"])
 def sale_remove_item(request, pk, item_pk):

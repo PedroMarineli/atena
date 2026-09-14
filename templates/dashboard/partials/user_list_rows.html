@@ -1,24 +1,83 @@
 {% for user in users %}
-<tr class="hover:bg-slate-50 transition-colors">
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ user.get_full_name }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ user.email }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ user.get_role_display }}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        {% if user.is_active %}
-        <span class="text-success font-medium">Sim</span>
+<tr class="hover:bg-slate-50/75 transition-colors group">
+    <td class="py-4 px-6">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-100 to-indigo-100 border border-brand-200 text-brand-700 flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                {% if user.first_name %}
+                    {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+                {% else %}
+                    {{ user.email|slice:":2"|upper }}
+                {% endif %}
+            </div>
+            <div>
+                <span class="font-medium text-slate-900 block">{{ user.get_full_name|default:user.email }}</span>
+                {% if user.get_full_name %}
+                <span class="text-xs text-slate-400 block">{{ user.username }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </td>
+    <td class="py-4 px-6 text-sm text-slate-600">
+        <div class="flex items-center gap-1.5">
+            <i data-lucide="mail" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>{{ user.email }}</span>
+        </div>
+    </td>
+    <td class="py-4 px-6">
+        {% if user.role == 'ADMIN' or user.is_superuser %}
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+            <i data-lucide="shield-check" class="w-3 h-3 text-purple-500"></i>
+            Administrador
+        </span>
         {% else %}
-        <span class="text-danger font-medium">Não</span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+            <i data-lucide="user" class="w-3 h-3 text-slate-400"></i>
+            {{ user.get_role_display|default:"Vendedor" }}
+        </span>
         {% endif %}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button hx-get="{% url 'user_update' user.pk %}" hx-target="#modal-content" @click="open = true"
-            class="text-accent hover:text-accent-hover mr-2 font-medium transition-colors">
-            Editar
-        </button>
-        <button hx-delete="{% url 'user_delete' user.pk %}" hx-confirm="Tem certeza que deseja excluir este usuário?"
-            hx-target="#user-table-body" class="text-danger hover:text-red-700 font-medium transition-colors">
-            Excluir
-        </button>
+    <td class="py-4 px-6 text-center">
+        {% if user.is_active %}
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Ativo
+        </span>
+        {% else %}
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            Inativo
+        </span>
+        {% endif %}
+    </td>
+    <td class="py-4 px-6 text-right">
+        <div class="flex items-center justify-end gap-1.5">
+            <button hx-get="{% url 'user_update' user.pk %}" 
+                    hx-target="#modal-content" 
+                    @click="open = true" 
+                    title="Editar Usuário"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+            </button>
+            <button hx-delete="{% url 'user_delete' user.pk %}" 
+                    hx-confirm="Tem certeza que deseja excluir o usuário {{ user.email }}?" 
+                    hx-target="#user-table-body" 
+                    title="Excluir Usuário"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="5" class="py-12 px-6 text-center text-slate-500">
+        <div class="flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <p class="font-medium text-slate-700">Nenhum usuário cadastrado</p>
+            <p class="text-xs text-slate-400 mt-1">Crie novos usuários para delegar o acesso ao sistema.</p>
+        </div>
     </td>
 </tr>
 {% endfor %}

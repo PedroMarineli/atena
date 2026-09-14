@@ -1,83 +1,144 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-BR" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Atena</title>
+    <title>Acessar Plataforma | Atena ERP</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CDN & Lucide Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    },
                     colors: {
-                        primary: {
-                            DEFAULT: '#1e293b', // Slate 800
-                            light: '#334155',   // Slate 700
-                            dark: '#0f172a',    // Slate 900
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            DEFAULT: '#4f46e5',
                         },
-                        secondary: {
-                            DEFAULT: '#64748b', // Slate 500
-                            light: '#94a3b8',   // Slate 400
-                        },
-                        accent: {
-                            DEFAULT: '#2563eb', // Blue 600
-                            hover: '#1d4ed8',   // Blue 700
-                        },
-                        surface: '#f8fafc',     // Slate 50
-                        danger: '#ef4444',      // Red 500
-                        success: '#22c55e',     // Green 500
-                        warning: '#f59e0b',     // Amber 500
+                        obsidian: {
+                            950: '#070a13',
+                            900: '#0b101d',
+                            850: '#11172a',
+                            800: '#172038',
+                            700: '#1e293b',
+                            600: '#334155',
+                            500: '#475569',
+                            400: '#64748b',
+                        }
                     }
                 }
             }
         }
     </script>
 </head>
+<body class="h-full bg-slate-950 font-sans text-slate-100 flex items-center justify-center p-4 relative overflow-hidden">
+    <!-- Ambient Background Lighting -->
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
-<body class="bg-surface h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border border-slate-200">
+    <div class="w-full max-w-md relative z-10">
+        <!-- Brand Header -->
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-primary-dark">Atena</h1>
-            <p class="text-secondary">Faça login para continuar</p>
+            <div class="inline-flex h-14 w-14 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-indigo-400 p-0.5 shadow-2xl shadow-brand-500/30 items-center justify-center mb-4 transition-transform hover:scale-105">
+                <svg class="h-8 w-8 text-white" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 2L4 7V16C4 23.5 9.1 30.1 16 32C22.9 30.1 28 23.5 28 16V7L16 2Z" fill="white" fill-opacity="0.2" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M16 7V25M11 12H21M13 18H19" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">ATENA <span class="text-brand-400 font-light">ERP</span></h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1.5 font-medium">Plataforma de Gestão & Inteligência Comercial</p>
         </div>
 
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-
-            {% if form.errors %}
-            <div class="bg-red-50 border border-red-200 text-danger px-4 py-3 rounded relative" role="alert">
-                <strong class="font-bold">Erro!</strong>
-                <span class="block sm:inline">Verifique suas credenciais.</span>
-            </div>
-            {% endif %}
-
-            <div>
-                <label for="{{ form.username.id_for_label }}"
-                    class="block text-sm font-medium text-primary-light">Email</label>
-                <input type="text" name="username" id="{{ form.username.id_for_label }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent
-                disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                invalid:border-pink-500 invalid:text-pink-600
-                focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+        <!-- Login Card -->
+        <div class="bg-obsidian-900/90 backdrop-blur-xl border border-obsidian-700/80 p-8 rounded-2xl shadow-2xl shadow-black/50">
+            <div class="mb-6">
+                <h2 class="text-lg font-bold text-white">Acessar sua conta</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Informe seu e-mail e senha para prosseguir</p>
             </div>
 
-            <div>
-                <label for="{{ form.password.id_for_label }}"
-                    class="block text-sm font-medium text-primary-light">Senha</label>
-                <input type="password" name="password" id="{{ form.password.id_for_label }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent
-                disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                invalid:border-pink-500 invalid:text-pink-600
-                focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-            </div>
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs" role="alert">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <strong class="font-semibold block">Credenciais Inválidas</strong>
+                        <span>Por favor, verifique seu e-mail e senha e tente novamente.</span>
+                    </div>
+                </div>
+                {% endif %}
 
-            <button type="submit"
-                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors">
-                Entrar
-            </button>
-        </form>
+                <!-- Username / Email Field -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                        E-mail
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </div>
+                        <input type="text" name="username" id="{{ form.username.id_for_label }}" required
+                            placeholder="seu.email@empresa.com"
+                            class="block w-full pl-10 pr-4 py-2.5 bg-obsidian-950 border border-obsidian-700 rounded-xl text-sm text-white placeholder-slate-500 shadow-inner
+                            focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 transition-all">
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label for="{{ form.password.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Senha
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                        </div>
+                        <input type="password" name="password" id="{{ form.password.id_for_label }}" required
+                            placeholder="••••••••"
+                            class="block w-full pl-10 pr-4 py-2.5 bg-obsidian-950 border border-obsidian-700 rounded-xl text-sm text-white placeholder-slate-500 shadow-inner
+                            focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 transition-all">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" 
+                        class="w-full mt-2 py-3 px-4 rounded-xl shadow-lg shadow-brand-500/25 text-sm font-bold text-white bg-gradient-to-r from-brand-600 via-brand-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2">
+                    <span>Entrar no Sistema</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Footer Note -->
+        <div class="text-center mt-6 text-xs text-slate-500 flex items-center justify-center gap-2">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+            <span>Ambiente seguro e criptografado</span>
+        </div>
     </div>
-</body>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) { lucide.createIcons(); }
+        });
+    </script>
+</body>
 </html>

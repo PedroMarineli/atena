@@ -1,45 +1,74 @@
-<table class="w-full divide-y divide-slate-200">
-    <thead class="bg-slate-50">
-        <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Item</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Qtd</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Preço Unit.</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Subtotal</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ações</th>
+<table class="w-full text-left border-collapse">
+    <thead>
+        <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+            <th class="py-3 px-4">Item</th>
+            <th class="py-3 px-4">Qtd</th>
+            <th class="py-3 px-4">Preço Unit.</th>
+            <th class="py-3 px-4">Subtotal</th>
+            <th class="py-3 px-4 text-right">Ação</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
         {% for item in sale.items.all %}
-        <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                {% if item.product %}
-                {{ item.product.name }} (Produto)
-                {% elif item.service %}
-                {{ item.service.name }} (Serviço)
-                {% else %}
-                Item desconhecido
-                {% endif %}
+        <tr class="hover:bg-slate-50/50 transition-colors">
+            <td class="py-3 px-4">
+                <div class="flex items-center gap-2">
+                    {% if item.product %}
+                        <span class="p-1 rounded-md bg-indigo-50 text-brand-600">
+                            <i data-lucide="package" class="w-3.5 h-3.5"></i>
+                        </span>
+                        <div>
+                            <span class="font-semibold text-slate-800">{{ item.product.name }}</span>
+                            <span class="text-[10px] uppercase font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded ml-1 border border-brand-200/50">Produto</span>
+                        </div>
+                    {% elif item.service %}
+                        <span class="p-1 rounded-md bg-sky-50 text-sky-600">
+                            <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
+                        </span>
+                        <div>
+                            <span class="font-semibold text-slate-800">{{ item.service.name }}</span>
+                            <span class="text-[10px] uppercase font-bold text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded ml-1 border border-sky-200/50">Serviço</span>
+                        </div>
+                    {% else %}
+                        <span class="text-slate-500">Item desconhecido</span>
+                    {% endif %}
+                </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ item.quantity }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {{ item.price }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">R$ {{ item.subtotal }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button hx-delete="{% url 'sale_remove_item' sale.pk item.pk %}" hx-target="#sale-items-container"
-                    class="text-danger hover:text-red-700 font-medium transition-colors">
-                    Remover
+            <td class="py-3 px-4 font-mono font-medium text-slate-700">{{ item.quantity }}</td>
+            <td class="py-3 px-4 font-mono text-slate-600">R$ {{ item.price|floatformat:2 }}</td>
+            <td class="py-3 px-4 font-mono font-bold text-slate-900">R$ {{ item.subtotal|floatformat:2 }}</td>
+            <td class="py-3 px-4 text-right">
+                {% if sale.status == 'PENDING' %}
+                <button hx-delete="{% url 'sale_remove_item' sale.pk item.pk %}" 
+                        hx-target="#sale-items-container" 
+                        title="Remover Item"
+                        class="inline-flex items-center justify-center p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
+                {% else %}
+                <span class="text-xs text-slate-400">-</span>
+                {% endif %}
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5" class="py-4 text-center text-secondary">Nenhum item adicionado.</td>
+            <td colspan="5" class="py-8 text-center text-slate-400">
+                <div class="flex flex-col items-center justify-center gap-1.5">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 text-slate-300"></i>
+                    <p class="text-xs font-medium text-slate-500">Nenhum item adicionado a esta venda ainda.</p>
+                </div>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
     <tfoot>
-        <tr class="font-bold bg-slate-50">
-            <td colspan="3" class="px-6 py-4 text-right text-sm text-slate-900">Total:</td>
-            <td class="px-6 py-4 text-sm text-slate-900">R$ {{ sale.total }}</td>
+        <tr class="bg-slate-50/90 border-t-2 border-slate-200">
+            <td colspan="3" class="py-3.5 px-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500">
+                Valor Total do Pedido:
+            </td>
+            <td class="py-3.5 px-4 font-mono font-extrabold text-base text-brand-700">
+                R$ {{ sale.total|floatformat:2 }}
+            </td>
             <td></td>
         </tr>
     </tfoot>
