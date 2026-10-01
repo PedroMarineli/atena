@@ -1,0 +1,3 @@
+[tool.bandit]
+exclude_dirs = ["venv", ".venv", "tests", "*/tests.py", ".secrets"]
+skips = ["B101"] # Skip assert checks in test suites

@@ -1,0 +1,96 @@
+# =============================================================================
+# Zero-Trust Network Policies for Atena ERP
+# Enforces default-deny and explicitly authorizes required traffic paths only.
+# =============================================================================
+
+# 1. Default Deny: All Ingress and Egress traffic blocked by default
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: atena
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# 2. Allow DNS: Allows pods to perform CoreDNS lookups in kube-system
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: atena
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# 3. Allow Ingress Controller to access Atena Web Service on port 8000
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-atena
+  namespace: atena
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: atena
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8000
+---
+# 4. Allow Atena pods to communicate with PostgreSQL on port 5432
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-atena-to-postgres
+  namespace: atena
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: atena
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+# 5. Allow PostgreSQL to receive traffic ONLY from Atena application pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-postgres-from-atena
+  namespace: atena
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: atena
+      ports:
+        - protocol: TCP
+          port: 5432

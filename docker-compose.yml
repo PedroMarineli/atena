@@ -1,49 +1,116 @@
+version: "3.8"
+
 services:
   atena-postgres:
-    image: postgres:15
+    image: postgres:15-alpine
     container_name: atena-postgres
-    restart: always
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
     environment:
-      POSTGRES_DB: atena
-      POSTGRES_USER: atena
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_db
+      - postgres_user
+      - postgres_password
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - atena-media:/app/media
-    ports:
-      - "5432:5432"
+    # Do not expose port 5432 to host; expose internally for django container only
+    expose:
+      - "5432"
+    networks:
+      - atena-backend-net
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U atena" ]
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/postgres_user) -d $$(cat /run/secrets/postgres_db)"]
       interval: 5s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
 
   atena-django:
-    image: pedromarineli/atena:latest
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: atena-erp:local
     container_name: atena-django
-    restart: always
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: "10001:10001"
     ports:
-      - "8888:8000"
+      - "127.0.0.1:8888:8000"
+    secrets:
+      - secret_key
+      - database_url
     environment:
-      SECRET_KEY: "django-insecure-change-me-in-production"
       DEBUG: "False"
-      ALLOWED_HOSTS: "*"
-      DATABASE_URL: "postgres://atena:password@atena-postgres:5432/atena"
-      # Configurações para HTTP (Disable SSL)
+      ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
       SECURE_SSL_REDIRECT: "False"
       SESSION_COOKIE_SECURE: "False"
       CSRF_COOKIE_SECURE: "False"
-      CSRF_TRUSTED_ORIGINS: "http://localhost:8888"
+      CSRF_TRUSTED_ORIGINS: "http://localhost:8888,http://127.0.0.1:8888"
+    volumes:
+      - atena-media:/app/media
+    networks:
+      - atena-backend-net
     depends_on:
       atena-postgres:
         condition: service_healthy
     command: >
-      sh -c "python manage.py collectstatic --noinput &&
-             python manage.py migrate &&
+      sh -c "python manage.py migrate --noinput &&
              python manage.py createauthuser &&
-             gunicorn --bind 0.0.0.0:8000 core.wsgi:application"
+             gunicorn --bind 0.0.0.0:8000 --workers 3 core.wsgi:application"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
 
 volumes:
   postgres-data:
+    driver: local
   atena-media:
+    driver: local
+
+networks:
+  atena-backend-net:
+    driver: bridge
+
+secrets:
+  postgres_db:
+    file: .secrets/postgres_db.txt
+  postgres_user:
+    file: .secrets/postgres_user.txt
+  postgres_password:
+    file: .secrets/postgres_password.txt
+  secret_key:
+    file: .secrets/django_secret_key.txt
+  database_url:
+    file: .secrets/database_url.txt

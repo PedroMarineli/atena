@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atena-app
+  namespace: atena
+  labels:
+    app.kubernetes.io/name: atena
+    app.kubernetes.io/part-of: atena-erp
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: atena
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: atena
+        app.kubernetes.io/part-of: atena-erp
+    spec:
+      # Pod-level security context (Pod Security Standard: Restricted)
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+
+      # Init container to run migrations safely before replicas accept traffic
+      initContainers:
+        - name: run-migrations
+          image: pedromarineli/atena:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - "python manage.py migrate --noinput"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: atena-config
+            - secretRef:
+                name: atena-secrets
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
+
+      containers:
+        - name: atena
+          image: pedromarineli/atena:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          # Container-level strict security context
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: atena-config
+            - secretRef:
+                name: atena-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 2
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
+            - name: media-volume
+              mountPath: /app/media
+
+      volumes:
+        # In-memory tmpfs for write operations required by Python/gunicorn in readOnlyRootFilesystem
+        - name: tmp-dir
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+        - name: media-volume
+          emptyDir: {}

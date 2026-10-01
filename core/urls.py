@@ -5,7 +5,13 @@ from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
 
+from core import health
+
 urlpatterns = [
+    # Health check probes (DevSecOps / SRE / Kubernetes)
+    path('healthz', health.liveness, name='healthz'),
+    path('ready', health.readiness, name='ready'),
+
     path('admin/', admin.site.urls), # Admin site
     path('accounts/', include('django.contrib.auth.urls')), # Authentication routes
     path('inventory/', include('inventory.urls')), # Inventory management

@@ -1,10 +1,50 @@
-venv/
-__pycache__/
-*.pyc
+# Version control & IDE
 .git/
 .gitignore
+.github/
+.vscode/
+.idea/
+
+# Python artifacts & environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Secrets & Local environments
 .env
+.env.*
+!.env.example
+.secrets/
+*.pem
+*.key
+
+# Local storage and state
 db.sqlite3
-media/
 staticfiles/
-k8s/
+media/
+deploy/
+scripts/
+*.md

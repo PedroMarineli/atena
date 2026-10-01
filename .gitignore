@@ -1,23 +1,26 @@
 # --- Python ---
-__pycache__
+__pycache__/
 *.py[cod]
 *$py.class
+*.so
+build/
+dist/
+*.egg-info/
 
-# --- Django ---
+# --- Django & Storage ---
 *.log
 db.sqlite3
 db.sqlite3-journal
-
-# Pasta de uploads de usuários (não versionar conteúdo de teste)
 media/
-
-# Pasta de arquivos estáticos coletados (gerado pelo collectstatic)
 staticfiles/
 
-# --- Segurança ---
-# Arquivos que guardam senhas e chaves secretas
+# --- Segredos & Variáveis de Ambiente ---
 .env
-.env.local
+.env.*
+!.env.example
+.secrets/
+*.pem
+*.key
 
 # --- Ambientes Virtuais ---
 venv/
@@ -25,10 +28,13 @@ venv/
 env/
 myenv/
 
+# --- Testes & Cobertura ---
+.pytest_cache/
+.coverage
+htmlcov/
+
 # --- IDEs e Sistema Operacional ---
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-
-.github

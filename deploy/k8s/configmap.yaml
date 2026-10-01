@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atena-config
+  namespace: atena
+  labels:
+    app.kubernetes.io/name: atena
+    app.kubernetes.io/part-of: atena-erp
+data:
+  DEBUG: "False"
+  ALLOWED_HOSTS: "atena.local,localhost,127.0.0.1,atena-service"
+  CSRF_TRUSTED_ORIGINS: "http://atena.local,https://atena.local"
+  SECURE_SSL_REDIRECT: "False"
+  SESSION_COOKIE_SECURE: "False"
+  CSRF_COOKIE_SECURE: "False"

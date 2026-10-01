@@ -1,0 +1,155 @@
+name: DevSecOps & Security Gateways
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  # ===========================================================================
+  # 1. Code Security, Secrets, Dependency SCA & Automated Tests
+  # ===========================================================================
+  code-security-and-tests:
+    name: SAST, SCA, Secrets & Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: atena_test
+          POSTGRES_USER: atena_user
+          POSTGRES_PASSWORD: test_secure_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full git history required for complete Gitleaks audit
+
+      # Gate 1: Secret Scanning with Gitleaks
+      - name: Run Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install System Dependencies for Weasyprint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libcairo2 libgdk-pixbuf-2.0-0 shared-mime-info
+
+      - name: Install Python Dependencies & Security Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-django bandit[toml] pip-audit
+
+      # Gate 2: Dependency Software Composition Analysis (SCA) with pip-audit
+      - name: Run Dependency Vulnerability Audit (SCA)
+        run: |
+          pip-audit -r requirements.txt --desc on
+
+      # Gate 3: Static Application Security Testing (SAST) with Bandit
+      - name: Run Python SAST (Bandit)
+        run: |
+          bandit -c pyproject.toml -r core inventory sales finance dashboard -ll
+
+      # Gate 4: Test Suite & Health Check Verification
+      - name: Run Automated Test Suite
+        env:
+          SECRET_KEY: "ci-testing-secret-key-do-not-use-in-production"
+          DEBUG: "False"
+          DATABASE_URL: "postgres://atena_user:test_secure_password@localhost:5432/atena_test"
+          ALLOWED_HOSTS: "localhost,127.0.0.1"
+          SECURE_SSL_REDIRECT: "False"
+          SESSION_COOKIE_SECURE: "False"
+          CSRF_COOKIE_SECURE: "False"
+        run: |
+          pytest -v
+
+  # ===========================================================================
+  # 2. Infrastructure as Code (IaC) & Misconfiguration Scan
+  # ===========================================================================
+  iac-misconfiguration-scan:
+    name: IaC Misconfiguration Scan (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy IaC Scan (Dockerfile, Compose, K8s)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "config"
+          scan-ref: "."
+          severity: "HIGH,CRITICAL"
+          format: "sarif"
+          output: "trivy-iac-results.sarif"
+          exit-code: "0"
+
+      - name: Upload IaC Scan Results to GitHub Security Tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-iac-results.sarif"
+          category: "trivy-iac"
+
+  # ===========================================================================
+  # 3. Hardened Container Build & Vulnerability Scan
+  # ===========================================================================
+  container-security-scan:
+    name: Container Image Build & CVE Scan
+    needs: [code-security-and-tests, iac-misconfiguration-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Hardened Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: atena-erp:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Gate 5: Deep Container Vulnerability Scan with Trivy
+      - name: Run Trivy Container Vulnerability Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "atena-erp:${{ github.sha }}"
+          format: "sarif"
+          output: "trivy-image-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "0"
+
+      - name: Upload Container Scan Results to GitHub Security Tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-image-results.sarif"
+          category: "trivy-container"
